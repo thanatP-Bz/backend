@@ -12,7 +12,7 @@ export const registerUser = async (req: Request, res: Response) => {
     }
 
     //check user exist
-    const userExist = await User.findOne({ email });
+    const userExist = await User.checkEmail(email);
 
     if (userExist) {
       return res

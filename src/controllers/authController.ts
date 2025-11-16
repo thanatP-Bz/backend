@@ -1,8 +1,12 @@
 import { Request, Response } from "express";
-
+import { IUser } from "../models/type";
 import { User } from "../models/Model";
+import { generateToken } from "../utils/generateToken";
 
-export const registerUser = async (req: Request, res: Response) => {
+export const registerUser = async (
+  req: Request<{}, {}, IUser>,
+  res: Response
+) => {
   try {
     const { name, email, password } = req.body;
 
@@ -26,8 +30,12 @@ export const registerUser = async (req: Request, res: Response) => {
       password,
     });
 
+    // token
+    const token = generateToken(newUser._id.toString());
+
     return res.status(201).json({
       message: "User register Successfully!",
+      token,
       user: {
         id: newUser._id,
         email: newUser.email,

@@ -1,10 +1,10 @@
 import { Schema, model, Model } from "mongoose";
 import { IUser } from "./type";
 import bcrypt from "bcrypt";
-import { threadId } from "worker_threads";
 
 export interface UserModel extends Model<IUser> {
   checkEmail(email: string): Promise<boolean>;
+  login(email: string, password: string): String;
 }
 
 const userSchema = new Schema<IUser>(
@@ -24,6 +24,26 @@ userSchema.statics.checkEmail = async function (email: string) {
   if (user) {
     throw Error("Email has been already in use!");
   }
+};
+
+userSchema.statics.login = async function (email: string, password: string) {
+  if (!email || !password) {
+    throw Error("All filed must be fill!");
+  }
+
+  const user = await this.findOne({ email });
+
+  if (!user) {
+    throw Error("incorrect Email");
+  }
+
+  const match = await bcrypt.compare(password, user.password);
+
+  if (!match) {
+    throw Error("Incorrect Password!");
+  }
+
+  return user;
 };
 
 userSchema.pre("save", async function (next) {

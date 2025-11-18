@@ -43,10 +43,20 @@ export const registerUser = async (
       },
     });
   } catch (error: any) {
-    return res.status(500).json({ message: error.message });
+    return res.status(400).json({ message: error.message });
   }
 };
 
 export const loginUser = async (req: Request, res: Response) => {
-  res.send("login user");
+  const { email, password } = req.body;
+
+  try {
+    const user = await User.login(email, password);
+
+    const token = generateToken((user as any)._id);
+
+    res.status(200).json({ email, token });
+  } catch (error: any) {
+    return res.status(400).json({ message: error.message });
+  }
 };

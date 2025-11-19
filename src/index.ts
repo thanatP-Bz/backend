@@ -3,15 +3,16 @@ import env from "dotenv";
 import cors from "cors";
 import connectDB from "./config/connectDB";
 import authRoutes from "./routes/authRoutes";
+import { errHandler } from "./middleware/errorHandler";
 env.config();
 
 const app = express();
 
 app.use(cors());
-
 //middleware
 app.use(express.json());
-
+//errorHanlder
+app.use(errHandler);
 //router
 app.use("/api/auth", authRoutes);
 

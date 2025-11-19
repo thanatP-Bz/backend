@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 
 export interface UserModel extends Model<IUser> {
   checkEmail(email: string): Promise<boolean>;
-  login(email: string, password: string): String;
+  login(email: string, password: string): Promise<IUser>;
 }
 
 const userSchema = new Schema<IUser>(

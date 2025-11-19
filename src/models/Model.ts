@@ -1,6 +1,7 @@
 import { Schema, model, Model } from "mongoose";
 import { IUser } from "./type";
 import bcrypt from "bcrypt";
+import { ApiError } from "../utils/ApiError";
 
 export interface UserModel extends Model<IUser> {
   checkEmail(email: string): Promise<boolean>;
@@ -22,25 +23,25 @@ userSchema.statics.checkEmail = async function (email: string) {
   const user = await this.findOne({ email });
 
   if (user) {
-    throw Error("Email has been already in use!");
+    throw new ApiError("Email has been already in use!", 401);
   }
 };
 
 userSchema.statics.login = async function (email: string, password: string) {
   if (!email || !password) {
-    throw Error("All filed must be fill!");
+    throw new ApiError("Email and password are required", 400);
   }
 
   const user = await this.findOne({ email });
 
   if (!user) {
-    throw Error("incorrect Email");
+    throw new ApiError("incorrect Email", 400);
   }
 
   const match = await bcrypt.compare(password, user.password);
 
   if (!match) {
-    throw Error("Incorrect Password!");
+    throw new ApiError("Incorrect Password!", 400);
   }
 
   return user;

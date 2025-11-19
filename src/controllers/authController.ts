@@ -1,27 +1,27 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { IUser } from "../models/type";
 import { User } from "../models/Model";
 import { generateToken } from "../utils/generateToken";
+import { ApiError } from "../utils/ApiError";
 
 export const registerUser = async (
   req: Request<{}, {}, IUser>,
-  res: Response
+  res: Response,
+  next: NextFunction
 ) => {
   try {
     const { name, email, password } = req.body;
 
     //check validation
     if (!name || !email || !password) {
-      res.status(400).send({ message: "all field are required" });
+      throw new ApiError("all field are required", 401);
     }
 
     //check user exist
     const userExist = await User.checkEmail(email);
 
     if (userExist) {
-      return res
-        .status(400)
-        .json({ message: "this email has been registered" });
+      throw new ApiError("this email has been registered", 409);
     }
 
     const newUser = await User.create({
@@ -43,14 +43,18 @@ export const registerUser = async (
       },
     });
   } catch (error: any) {
-    return res.status(400).json({ message: error.message });
+    next(error);
   }
 };
 
-export const loginUser = async (req: Request, res: Response) => {
-  const { email, password } = req.body;
-
+export const loginUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
+    const { email, password } = req.body;
+
     const user = await User.login(email, password);
 
     const token = generateToken((user as any)._id);
@@ -64,6 +68,6 @@ export const loginUser = async (req: Request, res: Response) => {
       token,
     });
   } catch (error: any) {
-    return res.status(400).json({ message: error.message });
+    next(error);
   }
 };

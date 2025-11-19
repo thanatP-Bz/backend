@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import { User } from "../models/Model";
 import { IUser } from "../models/type";
+import { ApiError } from "../utils/ApiError";
 
 declare global {
   namespace Express {
@@ -18,24 +19,31 @@ export const requireAuth = async (
   res: Response,
   next: NextFunction
 ) => {
-  const authorization = req.headers.authorization;
+  const authHeader = req.headers.authorization;
 
-  if (!authorization) {
-    return res.status(401).json({ message: "Authorization token required" });
+  if (!authHeader?.startsWith("Bearer ")) {
+    throw new ApiError("Authorization token required");
   }
 
-  const token = authorization.split(" ")[1];
+  const token = authHeader.split(" ")[1];
+  if (!token) {
+    throw new ApiError("Token missing", 401);
+  }
 
   try {
-    const { _id } = jwt.verify(
-      token as string,
-      process.env.JWT_SECRET as string
-    ) as { _id: string };
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
 
-    req.user = await User.findOne({ _id }).select("_id");
-    next();
+    if (!decoded._id) {
+      throw new ApiError("Invaild token payload", 401);
+    }
+
+    req.user = await User.findById(decoded._id).select("_id name email");
+
+    if (!req.user) {
+      throw new ApiError("User not found!", 404);
+    }
   } catch (error) {
     console.log(error);
-    res.status(401).json({ error: "Request is not authorized" });
+    throw new ApiError("Request is not authorized", 401);
   }
 };

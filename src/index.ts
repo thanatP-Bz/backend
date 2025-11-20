@@ -11,10 +11,10 @@ const app = express();
 app.use(cors());
 //middleware
 app.use(express.json());
-//errorHanlder
-app.use(errHandler);
 //router
 app.use("/api/auth", authRoutes);
+//errorHanlder
+app.use(errHandler);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("hello world");

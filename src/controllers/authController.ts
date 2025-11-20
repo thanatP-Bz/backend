@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { IUser } from "../models/type";
-import { User } from "../models/Model";
+import { User } from "../models/authModel";
 import { generateToken } from "../utils/generateToken";
 import { ApiError } from "../utils/ApiError";
 import { asyncHandler } from "../utils/asyncHandler";

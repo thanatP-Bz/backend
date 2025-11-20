@@ -3,6 +3,7 @@ import env from "dotenv";
 import cors from "cors";
 import connectDB from "./config/connectDB";
 import authRoutes from "./routes/authRoutes";
+import taskRoutes from "./routes/taskRoutes";
 import { errHandler } from "./middleware/errorHandler";
 env.config();
 
@@ -13,6 +14,7 @@ app.use(cors());
 app.use(express.json());
 //router
 app.use("/api/auth", authRoutes);
+app.use("./api/task", taskRoutes);
 //errorHanlder
 app.use(errHandler);
 

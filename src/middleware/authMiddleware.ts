@@ -22,7 +22,7 @@ export const requireAuth = async (
   const authHeader = req.headers.authorization;
 
   if (!authHeader?.startsWith("Bearer ")) {
-    throw new ApiError("Authorization token required");
+    throw new ApiError("Authorization token required", 401);
   }
 
   const token = authHeader.split(" ")[1];
@@ -34,16 +34,18 @@ export const requireAuth = async (
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
 
     if (!decoded._id) {
-      throw new ApiError("Invaild token payload", 401);
+      throw new ApiError("Invalid token payload", 401);
     }
 
-    req.user = await User.findById(decoded._id).select("_id name email");
+    const user = await User.findById(decoded._id).select("_id name email");
 
-    if (!req.user) {
-      throw new ApiError("User not found!", 404);
+    if (!user) {
+      throw new ApiError("User not found", 404);
     }
+
+    req.user = user; // attach user
+    next(); // ⚠️ important
   } catch (error) {
-    console.log(error);
     throw new ApiError("Request is not authorized", 401);
   }
 };

@@ -3,18 +3,15 @@ import { IUser } from "../models/type";
 import { User } from "../models/Model";
 import { generateToken } from "../utils/generateToken";
 import { ApiError } from "../utils/ApiError";
+import { asyncHandler } from "../utils/asyncHandler";
 
-export const registerUser = async (
-  req: Request<{}, {}, IUser>,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
+export const registerUser = asyncHandler(
+  async (req: Request<{}, {}, IUser>, res: Response) => {
     const { name, email, password } = req.body;
 
     //check validation
     if (!name || !email || !password) {
-      throw new ApiError("all field are required", 401);
+      throw new ApiError("all field are required", 400);
     }
 
     //check user exist
@@ -42,32 +39,22 @@ export const registerUser = async (
         password: newUser.password,
       },
     });
-  } catch (error: any) {
-    next(error);
   }
-};
+);
 
-export const loginUser = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const { email, password } = req.body;
+export const loginUser = asyncHandler(async (req: Request, res: Response) => {
+  const { email, password } = req.body;
 
-    const user = await User.login(email, password);
+  const user = await User.login(email, password);
 
-    const token = generateToken((user as any)._id);
+  const token = generateToken((user as any)._id);
 
-    res.status(200).json({
-      user: {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-      },
-      token,
-    });
-  } catch (error: any) {
-    next(error);
-  }
-};
+  res.status(200).json({
+    user: {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+    },
+    token,
+  });
+});

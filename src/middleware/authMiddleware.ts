@@ -1,18 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { User } from "../models/authModel";
-import { IUser } from "../models/type";
 import { ApiError } from "../utils/ApiError";
-
-declare global {
-  namespace Express {
-    interface Request {
-      user?: IUser | null;
-    }
-  }
-}
-
-export {};
 
 export const requireAuth = async (
   req: Request,

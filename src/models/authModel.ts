@@ -1,5 +1,5 @@
 import { Schema, model, Model } from "mongoose";
-import { IUser } from "./type";
+import { IUser } from "../types/user";
 import bcrypt from "bcrypt";
 import { ApiError } from "../utils/ApiError";
 

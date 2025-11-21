@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { IUser } from "../models/type";
+import { IUser } from "../types/user";
 import { User } from "../models/authModel";
 import { generateToken } from "../utils/generateToken";
 import { ApiError } from "../utils/ApiError";

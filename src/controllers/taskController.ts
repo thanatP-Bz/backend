@@ -13,7 +13,7 @@ const createTask = asyncHandler(async (req: Request, res: Response) => {
     user: req.user!._id,
   });
 
-  res.status(201).json(task);
+  res.status(201).json({ message: "Create Task Successfully!", task });
 });
 
 const getTask = async (req: Request, res: Response) => {
@@ -42,11 +42,27 @@ const updateTask = async (req: Request, res: Response) => {
 
   const updateTask = await task.save();
 
-  res.status(200).json(updateTask);
+  res.status(200).json({ message: "Update Task Successfully!", updateTask });
 };
 
 const deleteTask = async (req: Request, res: Response) => {
-  res.send("delete task");
+  const { id } = req.params;
+
+  const task = await Task.findById(id);
+
+  if (!task) {
+    throw new ApiError("Task not found", 404);
+  }
+  /* if (task.user.toString() !== req.user!._id.toString()) {
+    throw new ApiError("Not authorized", 403);
+  } */
+  if (!task.user.equals(req.user!._id)) {
+    throw new ApiError("Not authorized", 403);
+  }
+
+  await task.deleteOne();
+
+  res.status(200).json({ message: "Task deleted successfully" });
 };
 
 export { createTask, getTask, getTaskById, updateTask, deleteTask };

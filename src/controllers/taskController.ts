@@ -1,13 +1,15 @@
 import { Request, Response } from "express";
 import { Task } from "../models/taskModel";
 import { asyncHandler } from "../utils/asyncHandler";
+import { ApiError } from "../utils/ApiError";
 
 const createTask = asyncHandler(async (req: Request, res: Response) => {
-  const { title, description } = req.body;
+  const { title, description, isCompleted } = req.body;
 
   const task = await Task.create({
     title,
     description,
+    isCompleted,
     user: req.user!._id,
   });
 
@@ -15,14 +17,32 @@ const createTask = asyncHandler(async (req: Request, res: Response) => {
 });
 
 const getTask = async (req: Request, res: Response) => {
-  res.send("get task");
+  const tasks = await Task.find({ user: req.user!._id });
+
+  res.status(200).json(tasks);
 };
 
 const getTaskById = async (req: Request, res: Response) => {
-  res.send("get task by Id");
+  const { id } = req.params;
+  const task = await Task.findById(id);
+
+  res.status(200).json({ task });
 };
 const updateTask = async (req: Request, res: Response) => {
-  res.send("update task");
+  const { id } = req.params;
+
+  const task = await Task.findOne({ _id: id, user: req.user!.id });
+
+  if (!task) throw new ApiError("task not found", 400);
+
+  const { title, description, isCompleted } = req.body;
+  if (title !== undefined) task.title = title;
+  if (description !== undefined) task.description = description;
+  if (isCompleted !== undefined) task.isCompleted = isCompleted;
+
+  const updateTask = await task.save();
+
+  res.status(200).json(updateTask);
 };
 
 const deleteTask = async (req: Request, res: Response) => {

@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { registerUser, loginUser } from "../controllers/authController";
-import { requireAuth } from "../middleware/authMiddleware";
 
 const router = Router();
 //require auth for workout
@@ -10,6 +9,6 @@ const router = Router();
 router.post("/register", registerUser);
 
 //POST /api/auth/login
-router.post("/login", requireAuth, loginUser);
+router.post("/login", loginUser);
 
 export default router;

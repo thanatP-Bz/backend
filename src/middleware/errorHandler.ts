@@ -9,5 +9,5 @@ export const errHandler = (
   const stateCode = err.statusCode || 500;
   const message = err.message || "Something went wrong";
 
-  res.status(stateCode).json({ success: false, message });
+  res.status(stateCode).json({ status: false, message });
 };

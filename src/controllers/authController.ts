@@ -5,7 +5,8 @@ import { generateToken } from "../utils/generateToken";
 import { generateResetToken } from "../utils/generateResetToken";
 import { ApiError } from "../utils/ApiError";
 import { asyncHandler } from "../utils/asyncHandler";
-import bcrypt from "bcrypt"
+import bcrypt from "bcrypt";
+import crypto from "crypto";
 
 export const registerUser = asyncHandler(
   async (req: Request<{}, {}, IUser>, res: Response) => {
@@ -70,13 +71,15 @@ export const forgotPassword = asyncHandler(
     const user = await User.findOne({ email });
 
     if (!user) {
-      throw new ApiError("user not found", 400);
+      console.log(`Forgot password requested for non-existent email: ${email}`);
+      return res.status(200).json({
+        message: "If email exists, reset link sent",
+      });
     }
-
     const { resetToken, hashedToken } = generateResetToken();
 
     user.resetPasswordToken = hashedToken;
-    user.resetPasswordExpired = new Date(Date.now() + 15 * 60 * 1000);
+    user.resetPasswordExpires = new Date(Date.now() + 15 * 60 * 1000);
 
     await user.save();
 
@@ -84,7 +87,10 @@ export const forgotPassword = asyncHandler(
 
     console.log("Reset Link:", resetUrl);
 
-    res.status(200).json({ message: "Reset link set" });
+    res.status(200).json({ message: "Reset link sent" });
+
+    console.log("DB TOKEN:", user.resetPasswordToken);
+    console.log("EXPIRES:", user.resetPasswordExpires);
   }
 );
 
@@ -93,17 +99,34 @@ export const resetPassword = asyncHandler(
     const { token } = req.params;
     const { password } = req.body;
 
-    const { hashedToken } = generateResetToken();
+    if (!token) {
+      throw new ApiError("Reset token missing", 400);
+    }
 
+    // Hash the token from the URL
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+    // Find user with matching hashed token and not expired
     const user = await User.findOne({
       resetPasswordToken: hashedToken,
-      resetPasswordExpired: { $gt: Date.now() },
+      resetPasswordExpires: { $gt: Date.now() },
     });
 
     if (!user) {
-      throw new ApiError("Token Invalid or Expired", 400);
+      throw new ApiError("Token invalid or expired", 400);
     }
 
-    user.password = await 
+    // Hash new password
+    user.password = await bcrypt.hash(password, 10);
+
+    // Save updated user
+    await user.save();
+
+    // Response
+    res.status(200).json({ message: "Password reset successful" });
+
+    // Logs for debugging (optional)
+    console.log("RAW TOKEN:", token);
+    console.log("HASHED TOKEN:", hashedToken);
   }
 );

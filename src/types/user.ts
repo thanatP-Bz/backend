@@ -5,6 +5,6 @@ export interface IUser {
   email: string;
   password: string;
   name: string;
-  resetPasswordToken?: string;
+  resetPasswordToken?: string | null;
   resetPasswordExpires?: Date | null;
 }

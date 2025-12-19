@@ -116,17 +116,16 @@ export const resetPassword = asyncHandler(
       throw new ApiError("Token invalid or expired", 400);
     }
 
-    // Hash new password
-    user.password = await bcrypt.hash(password, 10);
+    user.password = password;
+
+    user.resetPasswordToken = null;
+    user.resetPasswordExpires = null;
 
     // Save updated user
     await user.save();
 
-    // Response
     res.status(200).json({ message: "Password reset successful" });
 
-    // Logs for debugging (optional)
-    console.log("RAW TOKEN:", token);
-    console.log("HASHED TOKEN:", hashedToken);
+    console.log("Password reset successful for user:", user.email);
   }
 );

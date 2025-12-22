@@ -5,7 +5,8 @@ import { generateToken } from "../utils/generateToken";
 import { generateResetToken } from "../utils/generateResetToken";
 import { ApiError } from "../utils/ApiError";
 import { asyncHandler } from "../utils/asyncHandler";
-import bcrypt from "bcrypt";
+import { sendEmail } from "../utils/sendEmail";
+import { getPasswordResetEmail } from "../utils/emailTemplate";
 import crypto from "crypto";
 
 export const registerUser = asyncHandler(
@@ -85,12 +86,25 @@ export const forgotPassword = asyncHandler(
 
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
 
-    console.log("Reset Link:", resetUrl);
+    try {
+      const emailContent = getPasswordResetEmail(resetUrl, user.name);
 
-    res.status(200).json({ message: "Reset link sent" });
+      await sendEmail({
+        to: user.email,
+        subject: emailContent.subject,
+        html: emailContent.html,
+        text: emailContent.text,
+      });
+      res.status(200).json({ message: "Reset link sent" });
+    } catch (error) {
+      user.resetPasswordToken = null;
+      user.resetPasswordExpires = null;
+      await user.save();
 
-    console.log("DB TOKEN:", user.resetPasswordToken);
-    console.log("EXPIRES:", user.resetPasswordExpires);
+      console.error("❌ Email sending failed:", error);
+
+      throw new ApiError("Error sending email. Please try again", 500);
+    }
   }
 );
 

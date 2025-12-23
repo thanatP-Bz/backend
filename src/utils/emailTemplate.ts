@@ -31,11 +31,12 @@ export const getPasswordResetEmail = (resetUrl: string, userName?: string) => {
             .button {
               display: inline-block;
               background-color: #4F46E5;
-              color: white;
+              color: white !important;
               padding: 12px 30px;
               text-decoration: none;
               border-radius: 5px;
               margin: 20px 0;
+              font-weight: bold;
             }
             .warning {
               background-color: #fef3c7;

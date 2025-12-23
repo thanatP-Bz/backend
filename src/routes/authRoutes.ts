@@ -2,7 +2,7 @@ import { Router } from "express";
 import {
   registerUser,
   loginUser,
-  forgotPassword,
+  forgetPassword,
   resetPassword,
 } from "../controllers/authController";
 
@@ -12,7 +12,7 @@ router.post("/register", registerUser);
 
 router.post("/login", loginUser);
 
-router.post("/forgot-password", forgotPassword);
+router.post("/forget-password", forgetPassword);
 
 router.post("/reset-password/:token", resetPassword);
 

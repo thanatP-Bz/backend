@@ -65,7 +65,7 @@ export const loginUser = asyncHandler(async (req: Request, res: Response) => {
 
 ///forget password and reset password
 
-export const forgotPassword = asyncHandler(
+export const forgetPassword = asyncHandler(
   async (req: Request, res: Response) => {
     const { email } = req.body;
 

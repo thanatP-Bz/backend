@@ -110,8 +110,8 @@ export const forgetPassword = asyncHandler(
 
 export const resetPassword = asyncHandler(
   async (req: Request, res: Response) => {
-    const { token } = req.params;
-    const { password } = req.body;
+    /*    const { token } = req.params; */
+    const { token, password } = req.body;
 
     if (!token) {
       throw new ApiError("Reset token missing", 400);

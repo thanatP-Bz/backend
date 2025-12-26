@@ -72,13 +72,25 @@ export const forgetPassword = asyncHandler(
     const user = await User.findOne({ email });
 
     if (!user) {
-      console.log(`Forgot password requested for non-existent email: ${email}`);
       return res.status(200).json({
         message: "If email exists, reset link sent",
       });
     }
+
+    // ✅ Cooldown FIRST
+    if (
+      user.resetPasswordExpires &&
+      user.resetPasswordExpires.getTime() > Date.now()
+    ) {
+      return res.json({
+        message: "Reset email already sent. Please check your inbox.",
+      });
+    }
+
+    // ✅ Generate token
     const { resetToken, hashedToken } = generateResetToken();
 
+    // ✅ Store token + expiry
     user.resetPasswordToken = hashedToken;
     user.resetPasswordExpires = new Date(Date.now() + 15 * 60 * 1000);
 
@@ -95,13 +107,12 @@ export const forgetPassword = asyncHandler(
         html: emailContent.html,
         text: emailContent.text,
       });
+
       res.status(200).json({ message: "Reset link sent" });
     } catch (error) {
       user.resetPasswordToken = null;
       user.resetPasswordExpires = null;
       await user.save();
-
-      console.error("❌ Email sending failed:", error);
 
       throw new ApiError("Error sending email. Please try again", 500);
     }
@@ -110,8 +121,8 @@ export const forgetPassword = asyncHandler(
 
 export const resetPassword = asyncHandler(
   async (req: Request, res: Response) => {
-    /*    const { token } = req.params; */
-    const { token, password } = req.body;
+    const { token } = req.params;
+    const { password } = req.body;
 
     if (!token) {
       throw new ApiError("Reset token missing", 400);

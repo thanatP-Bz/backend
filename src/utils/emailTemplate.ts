@@ -91,3 +91,96 @@ export const getPasswordResetEmail = (resetUrl: string, userName?: string) => {
     `,
   };
 };
+
+// utils/emailTemplates.ts (or wherever you have your email templates)
+
+export const getPasswordResetConfirmationEmail = (userName?: string) => {
+  return {
+    subject: "Password Changed Successfully",
+    html: `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              line-height: 1.6;
+              color: #333;
+            }
+            .container {
+              max-width: 600px;
+              margin: 0 auto;
+              padding: 20px;
+            }
+            .header {
+              background-color: #10b981;
+              color: white;
+              padding: 20px;
+              text-align: center;
+              border-radius: 5px 5px 0 0;
+            }
+            .content {
+              background-color: #f9fafb;
+              padding: 30px;
+              border-radius: 0 0 5px 5px;
+            }
+            .warning {
+              background-color: #fef3c7;
+              padding: 15px;
+              border-left: 4px solid #f59e0b;
+              margin: 20px 0;
+            }
+            .button {
+              display: inline-block;
+              background-color: #4F46E5;
+              color: white;
+              padding: 12px 30px;
+              text-decoration: none;
+              border-radius: 5px;
+              margin: 20px 0;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>✅ Password Changed Successfully</h1>
+            </div>
+            <div class="content">
+              <p>Hello ${userName || "User"},</p>
+              
+              <p>Your password has been successfully changed.</p>
+              
+              <p><strong>When:</strong> ${new Date().toLocaleString()}</p>
+              
+              <div class="warning">
+                <strong>⚠️ Didn't change your password?</strong>
+                <p>If you didn't make this change, please contact our support team immediately and secure your account.</p>
+              </div>
+              
+              <p>For security reasons, you may want to:</p>
+              <ul>
+                <li>Review your recent account activity</li>
+                <li>Update passwords on other accounts if you used the same password</li>
+                <li>Enable two-factor authentication (if available)</li>
+              </ul>
+              
+              <p>Thank you for keeping your account secure!</p>
+            </div>
+          </div>
+        </body>
+      </html>
+    `,
+    text: `
+      Password Changed Successfully
+      
+      Hello ${userName || "User"},
+      
+      Your password has been successfully changed on ${new Date().toLocaleString()}.
+      
+      If you didn't make this change, please contact support immediately.
+      
+      Thank you for keeping your account secure!
+    `,
+  };
+};

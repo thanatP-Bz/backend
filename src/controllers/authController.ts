@@ -1,156 +1,48 @@
 import { NextFunction, Request, Response } from "express";
-import { IUser } from "../types/user";
-import { User } from "../models/authModel";
-import { generateToken } from "../utils/generateToken";
-import { generateResetToken } from "../utils/generateResetToken";
 import { ApiError } from "../utils/ApiError";
 import { asyncHandler } from "../utils/asyncHandler";
-import { sendEmail } from "../utils/sendEmail";
-import { getPasswordResetEmail } from "../utils/emailTemplate";
-import crypto from "crypto";
+import { login, register } from "../services/auth.service";
+import {
+  forgetPassword,
+  resetPassword,
+} from "../services/passwordReset.service";
 
-export const registerUser = asyncHandler(
-  async (req: Request<{}, {}, IUser>, res: Response) => {
-    const { name, email, password } = req.body;
+//**************Register and Login***************//
 
-    //check validation
-    if (!name || !email || !password) {
-      throw new ApiError("all field are required", 400);
-    }
-
-    //check user exist
-    const userExist = await User.checkEmail(email);
-
-    if (userExist) {
-      throw new ApiError("this email has been registered", 409);
-    }
-
-    const newUser = await User.create({
-      name,
-      email,
-      password,
-    });
-
-    // token
-    const token = generateToken(newUser._id.toString());
-
-    return res.status(201).json({
-      message: "User register Successfully!",
-      token,
-      user: {
-        id: newUser._id,
-        email: newUser.email,
-        password: newUser.password,
-      },
-    });
-  }
-);
-
-export const loginUser = asyncHandler(async (req: Request, res: Response) => {
-  const { email, password } = req.body;
-
-  const user = await User.login(email, password);
-
-  const token = generateToken((user as any)._id);
-
-  res.status(200).json({
-    user: {
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-    },
-    token,
-  });
-});
-
-///forget password and reset password
-
-export const forgetPassword = asyncHandler(
+export const registerController = asyncHandler(
   async (req: Request, res: Response) => {
-    const { email } = req.body;
+    const result = await register(req.body);
 
-    const user = await User.findOne({ email });
-
-    if (!user) {
-      return res.status(200).json({
-        message: "If email exists, reset link sent",
-      });
-    }
-
-    // ✅ Cooldown FIRST
-    if (
-      user.resetPasswordExpires &&
-      user.resetPasswordExpires.getTime() > Date.now()
-    ) {
-      return res.json({
-        message: "Reset email already sent. Please check your inbox.",
-      });
-    }
-
-    // ✅ Generate token
-    const { resetToken, hashedToken } = generateResetToken();
-
-    // ✅ Store token + expiry
-    user.resetPasswordToken = hashedToken;
-    user.resetPasswordExpires = new Date(Date.now() + 15 * 60 * 1000);
-
-    await user.save();
-
-    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
-
-    try {
-      const emailContent = getPasswordResetEmail(resetUrl, user.name);
-
-      await sendEmail({
-        to: user.email,
-        subject: emailContent.subject,
-        html: emailContent.html,
-        text: emailContent.text,
-      });
-
-      res.status(200).json({ message: "Reset link sent" });
-    } catch (error) {
-      user.resetPasswordToken = null;
-      user.resetPasswordExpires = null;
-      await user.save();
-
-      throw new ApiError("Error sending email. Please try again", 500);
-    }
+    res.status(200).json(result);
   }
 );
 
-export const resetPassword = asyncHandler(
+export const loginController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const result = await login(req.body);
+
+    res.status(200).json(result);
+  }
+);
+
+//**************Forget and Reset Password***************//
+
+export const forgetPasswordController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const result = await forgetPassword(req.body.email);
+    res.status(200).json(result);
+  }
+);
+
+export const resetPasswordController = asyncHandler(
   async (req: Request, res: Response) => {
     const { token } = req.params;
     const { password } = req.body;
 
-    if (!token) {
-      throw new ApiError("Reset token missing", 400);
+    if (!token || !password) {
+      throw new ApiError("Token and password are required", 400);
     }
-
-    // Hash the token from the URL
-    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
-
-    // Find user with matching hashed token and not expired
-    const user = await User.findOne({
-      resetPasswordToken: hashedToken,
-      resetPasswordExpires: { $gt: Date.now() },
-    });
-
-    if (!user) {
-      throw new ApiError("Token invalid or expired", 400);
-    }
-
-    user.password = password;
-
-    user.resetPasswordToken = null;
-    user.resetPasswordExpires = null;
-
-    // Save updated user
-    await user.save();
-
-    res.status(200).json({ message: "Password reset successful" });
-
-    console.log("Password reset successful for user:", user.email);
+    const result = await resetPassword(token, password);
+    res.status(200).json(result);
   }
 );

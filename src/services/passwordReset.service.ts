@@ -20,8 +20,8 @@ export const forgetPassword = async (email: string) => {
 
   // ✅ Cooldown FIRST
   if (
-    user.resetPasswordExpires &&
-    user.resetPasswordExpires.getTime() > Date.now()
+    user.resetPasswordExpiry &&
+    user.resetPasswordExpiry.getTime() > Date.now()
   ) {
     return {
       message: "Reset email already sent. Please check your inbox.",
@@ -33,7 +33,7 @@ export const forgetPassword = async (email: string) => {
 
   // ✅ Store token + expiry
   user.resetPasswordToken = hashedToken;
-  user.resetPasswordExpires = new Date(Date.now() + 15 * 60 * 1000);
+  user.resetPasswordExpiry = new Date(Date.now() + 15 * 60 * 1000);
 
   await user.save();
 
@@ -52,7 +52,7 @@ export const forgetPassword = async (email: string) => {
     return { message: "Reset link sent" };
   } catch (error) {
     user.resetPasswordToken = null;
-    user.resetPasswordExpires = null;
+    user.resetPasswordExpiry = null;
 
     await user.save();
 
@@ -76,7 +76,7 @@ export const resetPassword = async (token: string, password: string) => {
 
   user.password = password;
   user.resetPasswordToken = null;
-  user.resetPasswordExpires = null;
+  user.resetPasswordExpiry = null;
   await user.save();
 
   // Send confirmation email (non-blocking)

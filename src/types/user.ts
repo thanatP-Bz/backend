@@ -1,10 +1,15 @@
-import { ObjectId } from "mongoose";
+import { ObjectId, Document } from "mongoose";
 
 export interface IUser {
-  _id: ObjectId;
   email: string;
   password: string;
   name: string;
   resetPasswordToken?: string | null;
-  resetPasswordExpires?: Date | null;
+  resetPasswordExpiry?: Date | null;
+  refreshToken: string | null;
+  refreshTokenExpiry: Date | null;
+}
+
+export interface IUserDocument extends IUser, Document {
+  _id: ObjectId;
 }

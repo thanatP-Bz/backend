@@ -1,6 +1,9 @@
-import { IUser } from "../types/user";
+import { IUser, IUserDocument } from "../types/user";
 import { User } from "../models/authModel";
-import { generateToken } from "../utils/generateToken";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+} from "../utils/generateToken";
 import { ApiError } from "../utils/ApiError";
 
 export const register = async (data: IUser) => {
@@ -23,11 +26,12 @@ export const register = async (data: IUser) => {
     email,
     password,
   });
-  const token = generateToken(newUser._id.toString());
+
+  const accessToken = generateAccessToken(newUser._id.toString());
 
   return {
     message: "User register Successfully!",
-    token,
+    accessToken,
     user: {
       id: newUser._id,
       email: newUser.email,
@@ -39,16 +43,23 @@ export const register = async (data: IUser) => {
 export const login = async (data: IUser) => {
   const { email, password } = data;
 
-  const user = await User.login(email, password);
+  const user = (await User.login(email, password)) as IUserDocument;
 
-  const token = generateToken((user as any)._id);
+  const accessToken = generateAccessToken(user._id.toString());
+  const refreshToken = generateRefreshToken(user._id.toString());
+
+  user.refreshToken = refreshToken;
+  user.refreshTokenExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+  await user.save();
 
   return {
+    message: "Login Successful",
+    accessToken,
+    refreshToken,
     user: {
       _id: user._id,
       name: user.name,
       email: user.email,
     },
-    token,
   };
 };

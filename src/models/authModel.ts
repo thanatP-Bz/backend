@@ -13,8 +13,14 @@ const userSchema = new Schema<IUser>(
     name: { type: String, required: true },
     email: { type: String, required: true },
     password: { type: String, required: true },
+
+    //reset pssword
     resetPasswordToken: { type: String },
-    resetPasswordExpires: { type: Date },
+    resetPasswordExpiry: { type: Date },
+
+    //reset token
+    refreshToken: { type: String },
+    refreshTokenExpiry: { type: Date },
   },
   {
     timestamps: true,

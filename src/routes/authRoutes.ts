@@ -1,19 +1,19 @@
 import { Router } from "express";
 import {
-  registerUser,
-  loginUser,
-  forgetPassword,
-  resetPassword,
+  registerController,
+  loginController,
+  forgetPasswordController,
+  resetPasswordController,
 } from "../controllers/authController";
 
 const router = Router();
 
-router.post("/register", registerUser);
+router.post("/register", registerController);
 
-router.post("/login", loginUser);
+router.post("/login", loginController);
 
-router.post("/forget-password", forgetPassword);
+router.post("/forget-password", forgetPasswordController);
 
-router.post("/reset-password/:token", resetPassword);
+router.post("/reset-password/:token", resetPasswordController);
 
 export default router;

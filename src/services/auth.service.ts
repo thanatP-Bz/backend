@@ -28,10 +28,12 @@ export const register = async (data: IUser) => {
   });
 
   const accessToken = generateAccessToken(newUser._id.toString());
+  const refreshToken = generateRefreshToken(newUser._id.toString());
 
   return {
     message: "User register Successfully!",
     accessToken,
+    refreshToken,
     user: {
       id: newUser._id,
       email: newUser.email,

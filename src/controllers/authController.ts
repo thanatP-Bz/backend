@@ -6,6 +6,7 @@ import {
   forgetPassword,
   resetPassword,
 } from "../services/passwordReset.service";
+import { refreshToken } from "../services/token.service";
 
 //**************Register and Login***************//
 
@@ -29,7 +30,10 @@ export const loginController = asyncHandler(
 
 export const forgetPasswordController = asyncHandler(
   async (req: Request, res: Response) => {
-    const result = await forgetPassword(req.body.email);
+    const { email } = req.body;
+
+    if (!email) throw new ApiError("Email is required", 400);
+    const result = await forgetPassword(email);
     res.status(200).json(result);
   }
 );
@@ -39,10 +43,21 @@ export const resetPasswordController = asyncHandler(
     const { token } = req.params;
     const { password } = req.body;
 
-    if (!token || !password) {
+    if (!token || !password)
       throw new ApiError("Token and password are required", 400);
-    }
+
     const result = await resetPassword(token, password);
+    res.status(200).json(result);
+  }
+);
+
+export const refreshTokenController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { token } = req.body;
+
+    if (!token) throw new ApiError("invalid refresh token", 401);
+
+    const result = await refreshToken(token);
     res.status(200).json(result);
   }
 );

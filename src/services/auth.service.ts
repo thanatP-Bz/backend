@@ -9,12 +9,12 @@ import { ApiError } from "../utils/ApiError";
 export const register = async (data: IUser) => {
   const { name, email, password } = data;
 
-  //check validation
+  // Check validation
   if (!name || !email || !password) {
     throw new ApiError("all field are required", 400);
   }
 
-  //check user exist
+  // Check user exist
   const userExist = await User.checkEmail(email);
 
   if (userExist) {
@@ -30,6 +30,11 @@ export const register = async (data: IUser) => {
   const accessToken = generateAccessToken(newUser._id.toString());
   const refreshToken = generateRefreshToken(newUser._id.toString());
 
+  // ✅ FIX: Save refresh token to database!
+  newUser.refreshToken = refreshToken;
+  newUser.refreshTokenExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+  await newUser.save();
+
   return {
     message: "User register Successfully!",
     accessToken,
@@ -37,7 +42,7 @@ export const register = async (data: IUser) => {
     user: {
       id: newUser._id,
       email: newUser.email,
-      password: newUser.password,
+      name: newUser.name, // ← Don't return password!
     },
   };
 };
@@ -52,6 +57,7 @@ export const login = async (data: IUser) => {
 
   user.refreshToken = refreshToken;
   user.refreshTokenExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
   await user.save();
 
   return {

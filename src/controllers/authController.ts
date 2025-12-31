@@ -20,8 +20,9 @@ export const registerController = asyncHandler(
 
 export const loginController = asyncHandler(
   async (req: Request, res: Response) => {
+    console.log("📨 Login request received");
     const result = await login(req.body);
-
+    console.log("✅ Login successful, sending response");
     res.status(200).json(result);
   }
 );
@@ -53,11 +54,9 @@ export const resetPasswordController = asyncHandler(
 
 export const refreshTokenController = asyncHandler(
   async (req: Request, res: Response) => {
-    const { token } = req.body;
-
-    if (!token) throw new ApiError("invalid refresh token", 401);
-
-    const result = await refreshToken(token);
+    console.log("📨 Refresh token request received");
+    const result = await refreshToken(req.body);
+    console.log("✅ Refresh successful, sending response");
     res.status(200).json(result);
   }
 );

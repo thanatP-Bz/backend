@@ -9,7 +9,7 @@ export const generateAccessToken = (userId: string) => {
   }
 
   return jwt.sign({ _id: userId }, secret, {
-    expiresIn: "1m",
+    expiresIn: "10m",
   });
 };
 
@@ -39,11 +39,26 @@ export const verifyAccessToken = (token: string) => {
 
 // Verify Refresh Token
 export const verifyRefreshToken = (token: string) => {
+  console.log("🔍 VERIFY REFRESH TOKEN:");
+  console.log("Token to verify:", token.substring(0, 30) + "...");
+  console.log("Secret exists:", !!process.env.JWT_REFRESH_SECRET);
+  console.log(
+    "Secret value:",
+    process.env.JWT_REFRESH_SECRET?.substring(0, 20) + "..."
+  );
+
   try {
     const secret = process.env.JWT_REFRESH_SECRET;
-    if (!secret) return null;
-    return jwt.verify(token, secret);
-  } catch (error) {
+    if (!secret) {
+      console.log("❌ No secret found!");
+      return null;
+    }
+
+    const decoded = jwt.verify(token, secret);
+    console.log("✅ Token verified successfully:", decoded);
+    return decoded;
+  } catch (error: any) {
+    console.log("❌ Token verification failed:", error.message);
     return null;
   }
 };

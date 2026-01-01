@@ -9,9 +9,14 @@ import { errHandler } from "./middleware/errorHandler";
 
 const app = express();
 
-app.use(cors());
 //middleware
 app.use(express.json());
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
 //router
 app.use("/api/auth", authRoutes);
 app.use("/api/task", taskRoutes);

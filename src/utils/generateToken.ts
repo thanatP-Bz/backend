@@ -9,7 +9,7 @@ export const generateAccessToken = (userId: string) => {
   }
 
   return jwt.sign({ _id: userId }, secret, {
-    expiresIn: "10m",
+    expiresIn: "1m",
   });
 };
 
@@ -39,14 +39,6 @@ export const verifyAccessToken = (token: string) => {
 
 // Verify Refresh Token
 export const verifyRefreshToken = (token: string) => {
-  console.log("🔍 VERIFY REFRESH TOKEN:");
-  console.log("Token to verify:", token.substring(0, 30) + "...");
-  console.log("Secret exists:", !!process.env.JWT_REFRESH_SECRET);
-  console.log(
-    "Secret value:",
-    process.env.JWT_REFRESH_SECRET?.substring(0, 20) + "..."
-  );
-
   try {
     const secret = process.env.JWT_REFRESH_SECRET;
     if (!secret) {

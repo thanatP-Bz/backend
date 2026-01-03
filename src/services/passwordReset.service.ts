@@ -39,6 +39,8 @@ export const forgetPassword = async (email: string) => {
 
   const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
 
+  console.log(`reset token: ${resetToken}`);
+
   try {
     const emailContent = getPasswordResetEmail(resetUrl, user.name);
 
@@ -67,7 +69,7 @@ export const resetPassword = async (token: string, password: string) => {
 
   const user = await User.findOne({
     resetPasswordToken: hashedToken,
-    resetPasswordExpires: { $gt: Date.now() },
+    resetPasswordExpiry: { $gt: Date.now() },
   });
 
   if (!user) {

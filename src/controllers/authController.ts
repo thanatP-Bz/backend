@@ -7,9 +7,9 @@ import {
   resetPassword,
 } from "../services/passwordReset.service";
 import { refreshToken } from "../services/token.service";
+import { verifyEmail } from "../services/verifyEmail.service";
 
-//**************Register and Login***************//
-
+//**************Register***************//
 export const registerController = asyncHandler(
   async (req: Request, res: Response) => {
     const result = await register(req.body);
@@ -18,6 +18,35 @@ export const registerController = asyncHandler(
   }
 );
 
+//**************verify Email***************//
+export const verifyEmailController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { token } = req.query;
+
+    console.log(token);
+
+    if (!token || typeof token !== "string") {
+      throw new ApiError("Verification token is required", 400);
+    }
+
+    const result = await verifyEmail(token);
+
+    res.status(200).json(result);
+  }
+);
+
+//**************resend verify Email***************//
+export const resendVerifyEmailController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { email } = req.body;
+
+    if (!email) throw new ApiError("Email is required", 400);
+    const result = await forgetPassword(email);
+    res.status(200).json(result);
+  }
+);
+
+//**************Login***************//
 export const loginController = asyncHandler(
   async (req: Request, res: Response) => {
     console.log("📨 Login request received");
@@ -27,8 +56,7 @@ export const loginController = asyncHandler(
   }
 );
 
-//**************Forget and Reset Password***************//
-
+//**************Forget Password***************//
 export const forgetPasswordController = asyncHandler(
   async (req: Request, res: Response) => {
     const { email } = req.body;
@@ -39,6 +67,7 @@ export const forgetPasswordController = asyncHandler(
   }
 );
 
+//**************Reset Password***************//
 export const resetPasswordController = asyncHandler(
   async (req: Request, res: Response) => {
     const { token } = req.params;
@@ -52,6 +81,7 @@ export const resetPasswordController = asyncHandler(
   }
 );
 
+//**************Refresh Token***************//
 export const refreshTokenController = asyncHandler(
   async (req: Request, res: Response) => {
     console.log("📨 Refresh token request received");

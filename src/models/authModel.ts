@@ -14,7 +14,12 @@ const userSchema = new Schema<IUser>(
     email: { type: String, required: true },
     password: { type: String, required: true },
 
-    //reset pssword
+    //verification email
+    isVerified: { type: Boolean, default: false },
+    verificationToken: { type: String },
+    verificationTokenExpiry: { type: Date },
+
+    //reset password
     resetPasswordToken: { type: String },
     resetPasswordExpiry: { type: Date },
 
@@ -44,6 +49,10 @@ userSchema.statics.login = async function (email: string, password: string) {
 
   if (!user) {
     throw new ApiError("incorrect Email", 400);
+  }
+
+  if (!user.isVerified) {
+    throw new ApiError("Please verify your email before logging in", 403);
   }
 
   const match = await bcrypt.compare(password, user.password);

@@ -4,6 +4,9 @@ export interface IUser {
   email: string;
   password: string;
   name: string;
+  isVerified: boolean;
+  verificationToken: string | null;
+  verificationTokenExpiry: Date | null;
   resetPasswordToken?: string | null;
   resetPasswordExpiry?: Date | null;
   refreshToken: string | null;

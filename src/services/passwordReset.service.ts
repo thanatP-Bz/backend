@@ -39,8 +39,6 @@ export const forgetPassword = async (email: string) => {
 
   const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
 
-  console.log(`reset token: ${resetToken}`);
-
   try {
     const emailContent = getPasswordResetEmail(resetUrl, user.name);
 

@@ -184,3 +184,104 @@ export const getPasswordResetConfirmationEmail = (userName?: string) => {
     `,
   };
 };
+
+// Add this to your existing emailTemplate.ts file
+
+export const getVerificationEmail = (
+  verificationUrl: string,
+  userName?: string
+) => {
+  return {
+    subject: "Verify Your Email Address",
+    html: `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              line-height: 1.6;
+              color: #333;
+            }
+            .container {
+              max-width: 600px;
+              margin: 0 auto;
+              padding: 20px;
+            }
+            .header {
+              background-color: #4F46E5;
+              color: white;
+              padding: 20px;
+              text-align: center;
+              border-radius: 5px 5px 0 0;
+            }
+            .content {
+              background-color: #f9fafb;
+              padding: 30px;
+              border-radius: 0 0 5px 5px;
+            }
+            .button {
+              display: inline-block;
+              background-color: #4F46E5;
+              color: white !important;
+              padding: 12px 30px;
+              text-decoration: none;
+              border-radius: 5px;
+              margin: 20px 0;
+              font-weight: bold;
+            }
+            .warning {
+              background-color: #fef3c7;
+              padding: 15px;
+              border-left: 4px solid #f59e0b;
+              margin: 20px 0;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>🎉 Welcome to Task Manager!</h1>
+            </div>
+            <div class="content">
+              <p>Hello ${userName || "User"},</p>
+              
+              <p>Thank you for signing up! Please verify your email address to activate your account:</p>
+              
+              <div style="text-align: center;">
+                <a href="${verificationUrl}" class="button">Verify Email</a>
+              </div>
+              
+              <p>Or copy this link:</p>
+              <p style="word-break: break-all; color: #4F46E5;">${verificationUrl}</p>
+              
+              <div class="warning">
+                <strong>⚠️ Important:</strong>
+                <ul>
+                  <li>This link expires in 24 hours</li>
+                  <li>If you didn't create an account, ignore this email</li>
+                  <li>You won't be able to login until you verify your email</li>
+                </ul>
+              </div>
+              
+              <p>Best regards,<br>Task Manager Team</p>
+            </div>
+          </div>
+        </body>
+      </html>
+    `,
+    text: `
+      Welcome to Task Manager!
+      
+      Hello ${userName || "User"},
+      
+      Thank you for signing up! Please verify your email address to activate your account.
+      
+      Click this link to verify: ${verificationUrl}
+      
+      This link expires in 24 hours.
+      
+      If you didn't create an account, ignore this email.
+    `,
+  };
+};

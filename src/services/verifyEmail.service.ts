@@ -37,7 +37,7 @@ export const resendVerificationEmail = async (email: string) => {
 
   if (!user) {
     return {
-      message: "if email exist, verification link sent",
+      message: "If email exists, verification link sent",
     };
   }
 
@@ -45,7 +45,7 @@ export const resendVerificationEmail = async (email: string) => {
     throw new ApiError("Email already verified", 400);
   }
 
-  //cooldown check (preven spam)
+  // Cooldown check (prevent spam)
   if (
     user.verificationTokenExpiry &&
     user.verificationTokenExpiry.getTime() > Date.now()
@@ -55,16 +55,17 @@ export const resendVerificationEmail = async (email: string) => {
     };
   }
 
-  //generate new token
+  // Generate new token
   const verificationToken = crypto.randomBytes(32).toString("hex");
   user.verificationToken = verificationToken;
-  /*  user.verificationTokenExpiry = new Date(Date.now() * 24 * 60 * 60 * 1000); */
-  const verificationTokenExpiry = new Date(Date.now() + 1 * 60 * 1000);
+  user.verificationTokenExpiry = new Date(Date.now() + 1 * 60 * 1000); // 1 min for testing
+  await user.save(); // ← Don't forget to save!
 
-  const verificaionUrl = `${process.env.FRONTEND_URL}/verify-email?token=${verificationToken}}`;
+  // ✅ Fixed: Removed extra } and fixed typo
+  const verificationUrl = `${process.env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
 
   try {
-    const emailContent = getVerificationEmail(verificaionUrl, user.name);
+    const emailContent = getVerificationEmail(verificationUrl, user.name);
 
     await sendEmail({
       to: user.email,
@@ -75,6 +76,6 @@ export const resendVerificationEmail = async (email: string) => {
 
     return { message: "Verification email resent" };
   } catch (error) {
-    throw new ApiError("Error sending email, Please try again", 500);
+    throw new ApiError("Error sending email. Please try again", 500);
   }
 };

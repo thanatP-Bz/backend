@@ -7,7 +7,10 @@ import {
   resetPassword,
 } from "../services/passwordReset.service";
 import { refreshToken } from "../services/token.service";
-import { verifyEmail } from "../services/verifyEmail.service";
+import {
+  resendVerificationEmail,
+  verifyEmail,
+} from "../services/verifyEmail.service";
 
 //**************Register***************//
 export const registerController = asyncHandler(
@@ -41,7 +44,7 @@ export const resendVerifyEmailController = asyncHandler(
     const { email } = req.body;
 
     if (!email) throw new ApiError("Email is required", 400);
-    const result = await forgetPassword(email);
+    const result = await resendVerificationEmail(email);
     res.status(200).json(result);
   }
 );

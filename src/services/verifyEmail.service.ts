@@ -5,10 +5,17 @@ import { getVerificationEmail } from "../utils/emailTemplate";
 import { sendEmail } from "../utils/sendEmail";
 //**************verify Email***************//
 export const verifyEmail = async (token: string) => {
-  const user = await User.findOne({ verificationToken: token });
-  console.log("Looking for token:", token);
+  console.log("🔍 Token received:", token);
+  console.log("🔍 Token has extra spaces?", `"${token}"`);
+  // Try to find by email first to see if user exists
+  const testUser = await User.findOne({ email: "bztzn512@gmail.com" });
+  console.log("👤 User exists?", testUser ? "YES" : "NO");
+  console.log("👤 User's token:", testUser?.verificationToken);
+  console.log("👤 Tokens match?", testUser?.verificationToken === token);
 
-  console.log("User found:", user);
+  // Now try the normal query
+  const user = await User.findOne({ verificationToken: token });
+  console.log("🎯 Found by token query?", user ? "YES" : "NO");
 
   if (!user) {
     throw new ApiError("Invalid verification token", 400);
@@ -34,15 +41,19 @@ export const verifyEmail = async (token: string) => {
 //**************resend verify Email***************//
 export const resendVerificationEmail = async (email: string) => {
   const user = await User.findOne({ email });
-
   if (!user) {
-    return {
-      message: "If email exists, verification link sent",
-    };
-  }
+    // Check if user exists but already verified
+    const verifiedUser = await User.findOne({
+      email: { $exists: true },
+      isVerified: true,
+      verificationToken: null,
+    });
 
-  if (user.isVerified) {
-    throw new ApiError("Email already verified", 400);
+    if (verifiedUser) {
+      throw new ApiError("Email already verified. Please log in.", 400);
+    }
+
+    throw new ApiError("Invalid or expired verification token", 400);
   }
 
   // Cooldown check (prevent spam)
@@ -59,6 +70,7 @@ export const resendVerificationEmail = async (email: string) => {
   const verificationToken = crypto.randomBytes(32).toString("hex");
   user.verificationToken = verificationToken;
   user.verificationTokenExpiry = new Date(Date.now() + 1 * 60 * 1000); // 1 min for testing
+
   await user.save(); // ← Don't forget to save!
 
   // ✅ Fixed: Removed extra } and fixed typo

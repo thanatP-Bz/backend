@@ -20,11 +20,6 @@ export const refreshToken = async (data: IUser) => {
     throw new ApiError("Invalid refresh Token", 401);
   }
 
-  console.log("\nSearching for user:");
-  console.log("  _id:", decoded._id);
-  console.log("  refreshToken match:", refreshToken.substring(0, 50) + "...");
-  console.log("  expiry must be >", new Date(Date.now()));
-
   // First, check if user exists
   const userExists = await User.findById(decoded._id);
   const user = await User.findOne({

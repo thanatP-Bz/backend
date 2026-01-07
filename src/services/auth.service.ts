@@ -28,9 +28,6 @@ export const register = async (data: IUser) => {
   const verificationToken = crypto.randomBytes(32).toString("hex");
   const verificationTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-  console.log("🔵 BEFORE User.create()");
-  console.log("🔵 Token to save:", verificationToken);
-
   const newUser = await User.create({
     name,
     email,
@@ -38,26 +35,6 @@ export const register = async (data: IUser) => {
     isVerified: false,
     verificationToken,
     verificationTokenExpiry,
-  });
-
-  console.log("🟢 AFTER User.create()");
-  console.log("🟢 newUser.verificationToken:", newUser.verificationToken);
-
-  // Check immediately what's in DB
-  const freshCheck = await User.findById(newUser._id);
-  console.log("🟡 Fresh from DB (immediately):", {
-    verificationToken: freshCheck?.verificationToken,
-    tokenLength: freshCheck?.verificationToken?.length,
-  });
-
-  // Wait 5 seconds
-  await new Promise((resolve) => setTimeout(resolve, 5000));
-
-  // Check again after 5 seconds
-  const checkAgain = await User.findById(newUser._id);
-  console.log("🕐 After 5 seconds, token still there?", {
-    verificationToken: checkAgain?.verificationToken,
-    tokenLength: checkAgain?.verificationToken?.length,
   });
 
   //send verification email
@@ -69,22 +46,11 @@ export const register = async (data: IUser) => {
       newUser.name || newUser.email
     );
 
-    console.log("📧 BEFORE sending email");
-
     await sendEmail({
       to: newUser.email,
       subject: emailContent.subject,
       html: emailContent.html,
       text: emailContent.text,
-    });
-
-    console.log("📧 AFTER sending email");
-
-    // Check AGAIN after email
-    const afterEmailCheck = await User.findById(newUser._id);
-    console.log("🔴 After email sent:", {
-      verificationToken: afterEmailCheck?.verificationToken,
-      tokenLength: afterEmailCheck?.verificationToken?.length,
     });
 
     return {
@@ -115,7 +81,6 @@ export const login = async (data: IUser) => {
 
   user.refreshToken = refreshToken;
   user.refreshTokenExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-
   await user.save();
 
   return {
@@ -127,5 +92,25 @@ export const login = async (data: IUser) => {
       name: user.name,
       email: user.email,
     },
+  };
+};
+
+export const logout = async (userId: string) => {
+  // Clear refresh token from database
+  const user = await User.findByIdAndUpdate(
+    userId,
+    {
+      refreshToken: null,
+      refreshTokenExpiry: null,
+    },
+    { new: true }
+  );
+
+  if (!user) {
+    throw new ApiError("User not found", 404);
+  }
+
+  return {
+    message: "Logged out successfully",
   };
 };

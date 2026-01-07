@@ -42,7 +42,6 @@ export const verifyRefreshToken = (token: string) => {
   try {
     const secret = process.env.JWT_REFRESH_SECRET;
     if (!secret) {
-      console.log("❌ No secret found!");
       return null;
     }
 
@@ -50,7 +49,6 @@ export const verifyRefreshToken = (token: string) => {
     console.log("✅ Token verified successfully:", decoded);
     return decoded;
   } catch (error: any) {
-    console.log("❌ Token verification failed:", error.message);
     return null;
   }
 };

@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { ApiError } from "../utils/ApiError";
 import { asyncHandler } from "../utils/asyncHandler";
-import { login, register } from "../services/auth.service";
+import { login, logout, register } from "../services/auth.service";
 import {
   forgetPassword,
   resetPassword,
@@ -11,6 +11,7 @@ import {
   resendVerificationEmail,
   verifyEmail,
 } from "../services/verifyEmail.service";
+import { access } from "fs";
 
 //**************Register***************//
 export const registerController = asyncHandler(
@@ -38,6 +39,27 @@ export const verifyEmailController = asyncHandler(
   }
 );
 
+//**************Login***************//
+export const loginController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const result = await login(req.body);
+
+    res.cookie("refreshToken", result.refreshToken),
+      {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      };
+
+    res.status(200).json({
+      message: result.message,
+      accessToken: result.accessToken,
+      user: result.user,
+    });
+  }
+);
+
 //**************resend verify Email***************//
 export const resendVerifyEmailController = asyncHandler(
   async (req: Request, res: Response) => {
@@ -45,16 +67,6 @@ export const resendVerifyEmailController = asyncHandler(
 
     if (!email) throw new ApiError("Email is required", 400);
     const result = await resendVerificationEmail(email);
-    res.status(200).json(result);
-  }
-);
-
-//**************Login***************//
-export const loginController = asyncHandler(
-  async (req: Request, res: Response) => {
-    console.log("📨 Login request received");
-    const result = await login(req.body);
-    console.log("✅ Login successful, sending response");
     res.status(200).json(result);
   }
 );
@@ -87,9 +99,43 @@ export const resetPasswordController = asyncHandler(
 //**************Refresh Token***************//
 export const refreshTokenController = asyncHandler(
   async (req: Request, res: Response) => {
-    console.log("📨 Refresh token request received");
-    const result = await refreshToken(req.body);
-    console.log("✅ Refresh successful, sending response");
+    const token = req.cookies.refreshToken;
+
+    if (!token) {
+      throw new ApiError("Refresh token not found", 401);
+    }
+    const result = await refreshToken(token);
+
+    res.cookie("refreshToken", result.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
+    res.status(200).json({
+      message: "Token refreshed successfully",
+      accessToken: result.accessToken,
+    });
+  }
+);
+
+//**************logout***************//
+export const logoutController = asyncHandler(
+  async (req: Request, res: Response) => {
+    // Get user ID (from auth middleware or however you get it)
+    const userId = req.user?._id || req.body.userId;
+
+    // Call service to clear database
+    const result = await logout(userId);
+
+    // ✅ Clear the cookie!
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+
     res.status(200).json(result);
   }
 );

@@ -6,10 +6,12 @@ import connectDB from "./config/connectDB";
 import authRoutes from "./routes/authRoutes";
 import taskRoutes from "./routes/taskRoutes";
 import { errHandler } from "./middleware/errorHandler";
+import cookieParser from "cookie-parser";
 
 const app = express();
 
 //middleware
+app.use(cookieParser());
 app.use(express.json());
 app.use(
   cors({

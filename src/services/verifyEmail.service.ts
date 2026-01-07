@@ -5,17 +5,8 @@ import { getVerificationEmail } from "../utils/emailTemplate";
 import { sendEmail } from "../utils/sendEmail";
 //**************verify Email***************//
 export const verifyEmail = async (token: string) => {
-  console.log("🔍 Token received:", token);
-  console.log("🔍 Token has extra spaces?", `"${token}"`);
-  // Try to find by email first to see if user exists
-  const testUser = await User.findOne({ email: "bztzn512@gmail.com" });
-  console.log("👤 User exists?", testUser ? "YES" : "NO");
-  console.log("👤 User's token:", testUser?.verificationToken);
-  console.log("👤 Tokens match?", testUser?.verificationToken === token);
-
   // Now try the normal query
   const user = await User.findOne({ verificationToken: token });
-  console.log("🎯 Found by token query?", user ? "YES" : "NO");
 
   if (!user) {
     throw new ApiError("Invalid verification token", 400);

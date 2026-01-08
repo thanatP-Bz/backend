@@ -123,10 +123,8 @@ export const refreshTokenController = asyncHandler(
 //**************logout***************//
 export const logoutController = asyncHandler(
   async (req: Request, res: Response) => {
-    // Get user ID (from auth middleware or however you get it)
     const userId = req.user?._id || req.body.userId;
 
-    // Call service to clear database
     const result = await logout(userId);
 
     // ✅ Clear the cookie!

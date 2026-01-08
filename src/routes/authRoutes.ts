@@ -7,6 +7,7 @@ import {
   refreshTokenController,
   verifyEmailController,
   resendVerifyEmailController,
+  logoutController,
 } from "../controllers/authController";
 
 const router = Router();
@@ -29,5 +30,8 @@ router.post("/reset-password", resetPasswordController);
 
 // Refresh Token
 router.post("/refresh-token", refreshTokenController);
+
+//log out
+router.post("/logout", logoutController);
 
 export default router;

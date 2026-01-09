@@ -8,29 +8,13 @@ export const requireAuth = async (
   res: Response,
   next: NextFunction
 ) => {
-  console.log("🔐 === AUTH MIDDLEWARE DEBUG ===");
-
-  const authHeader = req.headers.authorization;
-  console.log("1. Authorization header:", authHeader);
-
-  if (!authHeader?.startsWith("Bearer ")) {
-    console.log("❌ No Bearer token");
-    throw new ApiError("Authorization token required", 401);
-  }
-
-  const token = authHeader.split(" ")[1];
-  console.log("2. Token:", token?.substring(0, 30) + "...");
+  const token = req.cookies.accessToken;
 
   if (!token) {
     throw new ApiError("Token missing", 401);
   }
 
   try {
-    console.log(
-      "3. JWT_ACCESS_SECRET:",
-      process.env.JWT_ACCESS_SECRET ? "EXISTS" : "MISSING"
-    );
-
     const decoded = jwt.verify(
       token,
       process.env.JWT_ACCESS_SECRET!

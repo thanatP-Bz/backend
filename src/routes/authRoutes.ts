@@ -26,7 +26,7 @@ router.post("/resend-verification", resendVerifyEmailController);
 
 // Password Reset
 router.post("/forget-password", forgetPasswordController);
-router.post("/reset-password", resetPasswordController);
+router.post("/reset-password/:token", resetPasswordController);
 
 // Refresh Token
 router.post("/refresh-token", refreshTokenController);

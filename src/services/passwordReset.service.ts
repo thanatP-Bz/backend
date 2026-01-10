@@ -19,14 +19,14 @@ export const forgetPassword = async (email: string) => {
   }
 
   // ✅ Cooldown FIRST
-  if (
+  /*   if (
     user.resetPasswordExpiry &&
     user.resetPasswordExpiry.getTime() > Date.now()
   ) {
     return {
       message: "Reset email already sent. Please check your inbox.",
     };
-  }
+  } */
 
   // ✅ Generate token
   const { resetToken, hashedToken } = generateResetToken();
@@ -85,5 +85,5 @@ export const resetPassword = async (token: string, password: string) => {
     ...getPasswordResetConfirmationEmail(user.name || user.email),
   }).catch(console.error);
 
-  return { message: "Password reset successful" };
+  return { message: "Password reset successful!" };
 };

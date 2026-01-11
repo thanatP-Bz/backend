@@ -12,6 +12,7 @@ import {
   verifyEmail,
 } from "../services/verifyEmail.service";
 import { access } from "fs";
+import { createSession, deactivateSession } from "../services/session.service";
 
 //**************Register***************//
 export const registerController = asyncHandler(
@@ -44,6 +45,13 @@ export const loginController = asyncHandler(
   async (req: Request, res: Response) => {
     const result = await login(req.body);
 
+    //new: create session
+    const session = await createSession({
+      userId: result.user._id.toString(),
+      ipAddress: req.ip || req.socket.remoteAddress || "unknown",
+      userAgent: req.headers["user-agent"] || "unknown",
+    });
+
     res.cookie("accessToken", result.accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -52,6 +60,14 @@ export const loginController = asyncHandler(
     });
 
     res.cookie("refreshToken", result.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    //set sessionId cookie
+    res.cookie("session", session._id.toString(), {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
@@ -130,14 +146,20 @@ export const logoutController = asyncHandler(
   async (req: Request, res: Response) => {
     const userId = req.user?._id || req.body.userId;
 
+    //get sessionId from cookie and deactivate it
+    const sessionId = req.cookies.sessionId;
+
+    if (sessionId) {
+      await deactivateSession(sessionId);
+      console.log("Session deactivated:", sessionId);
+    }
+
     const result = await logout(userId);
 
     // ✅ Clear the cookie!
-    res.clearCookie("refreshToken", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-    });
+    res.clearCookie("accessToken");
+    res.clearCookie("refreshToken");
+    res.clearCookie("sessionId");
 
     res.status(200).json(result);
   }

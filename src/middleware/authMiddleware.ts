@@ -2,6 +2,10 @@ import { Request, Response, NextFunction } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { User } from "../models/authModel";
 import { ApiError } from "../utils/ApiError";
+import {
+  isSessionValid,
+  updateSessionActivity,
+} from "../services/session.service";
 
 export const requireAuth = async (
   req: Request,
@@ -9,9 +13,14 @@ export const requireAuth = async (
   next: NextFunction
 ) => {
   const token = req.cookies.accessToken;
+  const sessionId = req.cookies.sessionId;
 
   if (!token) {
     throw new ApiError("Token missing", 401);
+  }
+
+  if (!sessionId) {
+    throw new ApiError("Session is missing", 401);
   }
 
   try {
@@ -27,7 +36,13 @@ export const requireAuth = async (
       throw new ApiError("Invalid token payload", 401);
     }
 
-    console.log("5. Looking for user with _id:", decoded._id);
+    //check session Valid
+    const sessionValid = await isSessionValid(sessionId);
+
+    if (!sessionValid) {
+      console.log("session expired or invalid");
+      throw new ApiError("Session expired, please login again", 401);
+    }
 
     const user = await User.findById(decoded._id).select("_id name email");
 
@@ -36,6 +51,9 @@ export const requireAuth = async (
     if (!user) {
       throw new ApiError("User not found", 404);
     }
+
+    //update session activity
+    await updateSessionActivity(sessionId);
 
     req.user = user;
     console.log("✅ Auth successful!");

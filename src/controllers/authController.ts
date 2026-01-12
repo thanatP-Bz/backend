@@ -11,7 +11,6 @@ import {
   resendVerificationEmail,
   verifyEmail,
 } from "../services/verifyEmail.service";
-import { access } from "fs";
 import { createSession, deactivateSession } from "../services/session.service";
 
 //**************Register***************//
@@ -67,7 +66,7 @@ export const loginController = asyncHandler(
     });
 
     //set sessionId cookie
-    res.cookie("session", session._id.toString(), {
+    res.cookie("sessionId", session._id.toString(), {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",

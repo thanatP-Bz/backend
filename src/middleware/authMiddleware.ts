@@ -15,6 +15,8 @@ export const requireAuth = async (
   const token = req.cookies.accessToken;
   const sessionId = req.cookies.sessionId;
 
+  console.log(sessionId);
+
   if (!token) {
     throw new ApiError("Token missing", 401);
   }
@@ -28,8 +30,6 @@ export const requireAuth = async (
       token,
       process.env.JWT_ACCESS_SECRET!
     ) as JwtPayload;
-
-    console.log("4. Decoded token:", decoded);
 
     if (!decoded._id) {
       console.log("❌ No _id in decoded token");
@@ -56,6 +56,7 @@ export const requireAuth = async (
     await updateSessionActivity(sessionId);
 
     req.user = user;
+
     console.log("✅ Auth successful!");
     next();
   } catch (error: any) {

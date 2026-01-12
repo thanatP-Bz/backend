@@ -7,11 +7,25 @@ import authRoutes from "./routes/authRoutes";
 import taskRoutes from "./routes/taskRoutes";
 import { errHandler } from "./middleware/errorHandler";
 import cookieParser from "cookie-parser";
+import session from "express-session";
 
 const app = express();
 
 //middleware
 app.use(cookieParser());
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "SESSION_SECRET",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+    },
+  })
+);
 app.use(express.json());
 app.use(
   cors({
@@ -19,6 +33,7 @@ app.use(
     credentials: true,
   })
 );
+
 //router
 app.use("/api/auth", authRoutes);
 app.use("/api/task", taskRoutes);

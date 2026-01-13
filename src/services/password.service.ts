@@ -32,7 +32,7 @@ export const changePassword = async (
   }
 
   user.password = newPassword;
-
+  await user.save();
   return {
     message: "password change successfully!",
   };

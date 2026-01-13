@@ -3,9 +3,10 @@ import { ApiError } from "../utils/ApiError";
 import { asyncHandler } from "../utils/asyncHandler";
 import { login, logout, register } from "../services/auth.service";
 import {
+  changePassword,
   forgetPassword,
   resetPassword,
-} from "../services/passwordReset.service";
+} from "../services/password.service";
 import { refreshToken } from "../services/token.service";
 import {
   resendVerificationEmail,
@@ -85,9 +86,18 @@ export const resendVerifyEmailController = asyncHandler(
   async (req: Request, res: Response) => {
     const { email } = req.body;
 
-    if (!email) throw new ApiError("Email is required", 400);
     const result = await resendVerificationEmail(email);
     res.status(200).json(result);
+  }
+);
+
+//**************change Password***************//
+export const changePasswordController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { email, oldPassword, newPassword } = req.body;
+    const result = await changePassword(email, oldPassword, newPassword);
+
+    return res.status(200).json(result);
   }
 );
 

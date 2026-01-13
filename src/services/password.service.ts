@@ -2,11 +2,41 @@ import { ApiError } from "../utils/ApiError";
 import { sendEmail } from "../utils/sendEmail";
 import { User } from "../models/authModel";
 import crypto from "crypto";
+import bcrypt from "bcrypt";
 import { generateResetToken } from "../utils/generateResetToken";
 import {
   getPasswordResetConfirmationEmail,
   getPasswordResetEmail,
 } from "../utils/emailTemplate";
+
+//**************reset password***************//
+export const changePassword = async (
+  email: string,
+  oldPassword: string,
+  newPassword: string
+) => {
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    throw new ApiError("user not found", 404);
+  }
+
+  const match = await bcrypt.compare(oldPassword, user.password);
+
+  if (!match) {
+    throw new ApiError("Old password does not match", 400);
+  }
+
+  if (oldPassword === newPassword) {
+    throw new ApiError("New password must be different from old password", 400);
+  }
+
+  user.password = newPassword;
+
+  return {
+    message: "password change successfully!",
+  };
+};
 
 //**************forget password***************//
 export const forgetPassword = async (email: string) => {

@@ -22,7 +22,7 @@ export const generateRefreshToken = (userId: string) => {
   }
 
   return jwt.sign({ _id: userId }, secret, {
-    expiresIn: "1m",
+    expiresIn: "7d",
   });
 };
 

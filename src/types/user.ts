@@ -1,4 +1,4 @@
-import { ObjectId, Document } from "mongoose";
+import { Types, Document } from "mongoose";
 
 export interface IUser {
   email: string;
@@ -11,8 +11,11 @@ export interface IUser {
   resetPasswordExpiry?: Date | null;
   refreshToken: string | null;
   refreshTokenExpiry: Date | null;
+  twoFactorSecret?: string | undefined;
+  twoFactorEnabled: boolean;
+  backupCodes?: string[] | undefined;
 }
 
 export interface IUserDocument extends IUser, Document {
-  _id: ObjectId;
+  _id: Types.ObjectId;
 }

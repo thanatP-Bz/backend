@@ -26,6 +26,11 @@ const userSchema = new Schema<IUser>(
     //reset token
     refreshToken: { type: String },
     refreshTokenExpiry: { type: Date },
+
+    //2FA
+    twoFactorSecret: { type: String },
+    twoFactorEnabled: { type: Boolean, default: false },
+    backupCodes: [{ type: String }],
   },
   {
     timestamps: true,

@@ -1,7 +1,12 @@
 import { NextFunction, Request, Response } from "express";
 import { ApiError } from "../utils/ApiError";
 import { asyncHandler } from "../utils/asyncHandler";
-import { login, logout, register } from "../services/auth.service";
+import {
+  login,
+  logout,
+  register,
+  verify2FALogin,
+} from "../services/auth.service";
 import {
   changePassword,
   forgetPassword,
@@ -45,9 +50,66 @@ export const loginController = asyncHandler(
   async (req: Request, res: Response) => {
     const result = await login(req.body);
 
+    //check 2FA
+    if ("requires2FA" in result && result.requires2FA) {
+      // 2FA required - don't create session or set cookies
+      return res.status(200).json({
+        requires2FA: true,
+        message: result.message,
+        userId: result.userId,
+      });
+    }
+
     //new: create session
     const session = await createSession({
-      userId: result.user._id.toString(),
+      userId: result.user!._id.toString(),
+      ipAddress: req.ip || req.socket.remoteAddress || "unknown",
+      userAgent: req.headers["user-agent"] || "unknown",
+    });
+
+    res.cookie("accessToken", result.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 15 * 60 * 1000,
+    });
+
+    res.cookie("refreshToken", result.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    //set sessionId cookie
+    res.cookie("sessionId", session._id.toString(), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.status(200).json({
+      message: result.message,
+      user: result.user,
+    });
+  }
+);
+
+//**************verify 2FA Login***************//
+export const verify2FALoginController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { userId, token } = req.body;
+
+    if (!userId || !token) {
+      return res.status(400).json({ message: "User ID and 2FA are required" });
+    }
+
+    const result = await verify2FALogin(userId, token);
+
+    //new: create session
+    const session = await createSession({
+      userId: result.user!._id.toString(),
       ipAddress: req.ip || req.socket.remoteAddress || "unknown",
       userAgent: req.headers["user-agent"] || "unknown",
     });

@@ -8,6 +8,7 @@ import { ApiError } from "../utils/ApiError";
 import crypto from "crypto";
 import { getVerificationEmail } from "../utils/emailTemplate";
 import { sendEmail } from "../utils/sendEmail";
+import { verify2FAToken } from "./2FA.service";
 
 export const register = async (data: IUser) => {
   const { name, email, password } = data;
@@ -75,6 +76,52 @@ export const login = async (data: IUser) => {
   const { email, password } = data;
 
   const user = (await User.login(email, password)) as IUserDocument;
+
+  //check is 2FA is enable
+  if (user.twoFactorEnabled) {
+    return {
+      requires2FA: true,
+      message: "Please enter your 2FA code",
+      userId: user._id.toString(),
+    };
+  }
+
+  const accessToken = generateAccessToken(user._id.toString());
+  const refreshToken = generateRefreshToken(user._id.toString());
+
+  user.refreshToken = refreshToken;
+  user.refreshTokenExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+  await user.save();
+
+  return {
+    message: "Login Successful",
+    accessToken,
+    refreshToken,
+    user: {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+    },
+  };
+};
+/* verify 2FA login */
+export const verify2FALogin = async (userId: string, token: string) => {
+  const user = (await User.findById(userId)) as IUserDocument;
+
+  if (!user) {
+    throw new ApiError("User not found", 404);
+  }
+
+  if (!user.twoFactorEnabled) {
+    throw new ApiError("2FA is not enabled for this user", 400);
+  }
+
+  //verify 2FA token
+  const isValid = await verify2FAToken(user.email, token);
+
+  if (!isValid) {
+    throw new ApiError("invalid 2FA code", 400);
+  }
 
   const accessToken = generateAccessToken(user._id.toString());
   const refreshToken = generateRefreshToken(user._id.toString());

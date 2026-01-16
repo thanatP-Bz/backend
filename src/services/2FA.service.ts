@@ -151,3 +151,25 @@ export const disable2FA = async (email: string, password: string) => {
     message: "2FA disable successfully!",
   };
 };
+
+//regenerate backup codes
+export const regenerateBackupCodes = async (email: string) => {
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    throw new ApiError("User not found", 404);
+  }
+
+  if (!user.twoFactorEnabled) {
+    throw new ApiError("2FA is not enabled", 400);
+  }
+
+  const backupCodes = generateBackupCodes();
+  user.backupCodes = backupCodes.map((code) => hashBackupCode(code));
+  await user.save();
+
+  return {
+    message: "Backup codes regenerated successfully!",
+    backupCodes,
+  };
+};

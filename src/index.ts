@@ -5,6 +5,7 @@ import cors from "cors";
 import connectDB from "./config/connectDB";
 import authRoutes from "./routes/authRoutes";
 import taskRoutes from "./routes/taskRoutes";
+import twoFactorRoutes from "./routes/2FARoutes";
 import { errHandler } from "./middleware/errorHandler";
 import cookieParser from "cookie-parser";
 import session from "express-session";
@@ -37,6 +38,7 @@ app.use(
 //router
 app.use("/api/auth", authRoutes);
 app.use("/api/task", taskRoutes);
+app.use("/api/2fa", twoFactorRoutes);
 //errorHanlder
 app.use(errHandler);
 

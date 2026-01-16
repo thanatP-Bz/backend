@@ -38,7 +38,8 @@ app.use(
 //router
 app.use("/api/auth", authRoutes);
 app.use("/api/task", taskRoutes);
-app.use("/api/2fa", twoFactorRoutes);
+app.use("/api/auth/2fa", twoFactorRoutes);
+
 //errorHanlder
 app.use(errHandler);
 

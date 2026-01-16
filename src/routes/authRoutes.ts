@@ -9,6 +9,7 @@ import {
   resendVerifyEmailController,
   logoutController,
   changePasswordController,
+  verify2FALoginController,
 } from "../controllers/authController";
 import { requireAuth } from "../middleware/authMiddleware";
 
@@ -19,6 +20,9 @@ router.post("/register", registerController);
 
 // Login
 router.post("/login", loginController);
+
+// verify 2FA login
+router.post("/verify-2fa-login", verify2FALoginController);
 
 // Email Verification
 router.get("/verify-email", verifyEmailController);

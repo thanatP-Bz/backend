@@ -18,7 +18,7 @@ router.post("/enable", enable2FAController);
 router.post("/verify-setup", verify2FASetupController);
 
 //disable 2FA - required password
-router.post("disable", disable2FAController);
+router.post("/disable", disable2FAController);
 
 //Regenerate backup codes
 router.post("/regenerate-backup-codes", regenerateBackendCodesController);

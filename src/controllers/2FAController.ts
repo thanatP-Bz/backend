@@ -10,7 +10,7 @@ import {
 import { ApiError } from "../utils/ApiError";
 
 //enable 2FA
-export const enable2FAController = asyncHandler(async () => {
+export const enable2FAController = asyncHandler(
   async (req: Request, res: Response) => {
     const email = req.user?.email;
 
@@ -20,8 +20,8 @@ export const enable2FAController = asyncHandler(async () => {
 
     const result = await enabled2FA(email);
     return res.status(200).json(result);
-  };
-});
+  }
+);
 
 //verify 2FA
 export const verify2FASetupController = asyncHandler(
@@ -46,7 +46,7 @@ export const verify2FASetupController = asyncHandler(
 //disable2FA
 export const disable2FAController = asyncHandler(
   async (req: Request, res: Response) => {
-    const { email } = req.user?.email;
+    const email = req.user?.email;
     const { password } = req.body;
 
     if (!email) {
@@ -65,7 +65,7 @@ export const disable2FAController = asyncHandler(
 //regenrate backup codes
 export const regenerateBackendCodesController = asyncHandler(
   async (req: Request, res: Response) => {
-    const { email } = req.user?.email;
+    const email = req.user?.email;
 
     if (!email) {
       throw new ApiError("Unthorized", 401);

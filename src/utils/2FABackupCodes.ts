@@ -4,14 +4,9 @@ import { ApiError } from "./ApiError";
 
 //generate backup code
 function generateBackupCodes(): string[] {
-  const codes: string[] = [];
-
-  for (let i = 0; i < 8; i++) {
-    const code = crypto.randomBytes(4).toString("hex").toUpperCase();
-    codes.push(code);
-  }
-
-  return codes;
+  return Array.from({ length: 8 }, () =>
+    crypto.randomBytes(4).toString("hex").toUpperCase()
+  );
 }
 
 //hash backup code for storage

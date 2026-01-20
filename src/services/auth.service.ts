@@ -44,7 +44,7 @@ export const register = async (data: IUser) => {
   try {
     const emailContent = getVerificationEmail(
       verificationUrl,
-      newUser.name || newUser.email
+      newUser.name || newUser.email,
     );
 
     await sendEmail({
@@ -67,7 +67,7 @@ export const register = async (data: IUser) => {
     await User.findByIdAndDelete(newUser._id);
     throw new ApiError(
       "Error sending verification email. Please try again",
-      500
+      500,
     );
   }
 };
@@ -138,6 +138,7 @@ export const verify2FALogin = async (userId: string, token: string) => {
       _id: user._id,
       name: user.name,
       email: user.email,
+      twoFactorEnabled: true,
     },
   };
 };
@@ -150,7 +151,7 @@ export const logout = async (userId: string) => {
       refreshToken: null,
       refreshTokenExpiry: null,
     },
-    { new: true }
+    { new: true },
   );
 
   if (!user) {

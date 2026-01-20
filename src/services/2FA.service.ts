@@ -54,7 +54,7 @@ export const verify2FASetup = async (email: string, token: string) => {
   if (!user.twoFactorSecret) {
     throw new ApiError(
       "2FA setup not initiated. Please enable 2 FA first",
-      400
+      400,
     );
   }
 
@@ -90,7 +90,7 @@ export const verify2FASetup = async (email: string, token: string) => {
 //Verify TOTP token during login
 export const verify2FAToken = async (
   email: string,
-  token: string
+  token: string,
 ): Promise<boolean> => {
   const user = await User.findOne({ email });
 
@@ -142,13 +142,14 @@ export const disable2FA = async (email: string, password: string) => {
   }
 
   //disable 2FA
-  (user.twoFactorEnabled = false),
+  ((user.twoFactorEnabled = false),
     (user.twoFactorSecret = undefined),
     (user.backupCodes = undefined),
-    await user.save();
+    await user.save());
 
   return {
     message: "2FA disable successfully!",
+    twoFactorEnabled: false,
   };
 };
 

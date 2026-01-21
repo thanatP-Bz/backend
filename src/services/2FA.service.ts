@@ -22,18 +22,30 @@ export const enabled2FA = async (email: string) => {
     throw new ApiError("2FA is already enabled", 400);
   }
 
-  /* generate secret */
-  const secret = speakeasy.generateSecret({
-    name: `TaskApp (${user.email})`,
-    issuer: "TaskApp",
-  });
+  /* Check if user already has a secret (from previous setup) */
+  let secret;
+  let qrCodeUrl;
 
-  /* generate QR as data URL */
-  const qrCodeUrl = await qrcode.toDataURL(secret.otpauth_url!);
+  if (user.twoFactorSecret) {
+    // ✅ User has existing secret - reuse it!
+    secret = {
+      base32: user.twoFactorSecret,
+      otpauth_url: `otpauth://totp/TaskApp:${user.email}?secret=${user.twoFactorSecret}&issuer=TaskApp`,
+    };
+  } else {
+    // ✅ No existing secret - generate new one
+    secret = speakeasy.generateSecret({
+      name: `TaskApp (${user.email})`,
+      issuer: "TaskApp",
+    });
 
-  //save secret tamporarily (wait for verification to enable)
-  user.twoFactorSecret = secret.base32;
-  await user.save();
+    // Save the new secret
+    user.twoFactorSecret = secret.base32;
+    await user.save();
+  }
+
+  /* Generate QR code from the secret (existing or new) */
+  qrCodeUrl = await qrcode.toDataURL(secret.otpauth_url!);
 
   return {
     secret: secret.base32,
@@ -142,10 +154,8 @@ export const disable2FA = async (email: string, password: string) => {
   }
 
   //disable 2FA
-  ((user.twoFactorEnabled = false),
-    (user.twoFactorSecret = undefined),
-    (user.backupCodes = undefined),
-    await user.save());
+  user.twoFactorEnabled = false;
+  await user.save();
 
   return {
     message: "2FA disable successfully!",

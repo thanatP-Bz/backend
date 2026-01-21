@@ -25,7 +25,7 @@ export const registerController = asyncHandler(
     const result = await register(req.body);
 
     res.status(200).json(result);
-  }
+  },
 );
 
 //**************verify Email***************//
@@ -42,7 +42,7 @@ export const verifyEmailController = asyncHandler(
     const result = await verifyEmail(token);
 
     res.status(200).json(result);
-  }
+  },
 );
 
 //**************Login***************//
@@ -93,7 +93,7 @@ export const loginController = asyncHandler(
       message: result.message,
       user: result.user,
     });
-  }
+  },
 );
 
 //**************verify 2FA Login***************//
@@ -140,7 +140,7 @@ export const verify2FALoginController = asyncHandler(
       message: result.message,
       user: result.user,
     });
-  }
+  },
 );
 
 //**************resend verify Email***************//
@@ -150,7 +150,7 @@ export const resendVerifyEmailController = asyncHandler(
 
     const result = await resendVerificationEmail(email);
     res.status(200).json(result);
-  }
+  },
 );
 
 //**************change Password***************//
@@ -160,7 +160,7 @@ export const changePasswordController = asyncHandler(
     const result = await changePassword(email, oldPassword, newPassword);
 
     return res.status(200).json(result);
-  }
+  },
 );
 
 //**************Forget Password***************//
@@ -171,7 +171,7 @@ export const forgetPasswordController = asyncHandler(
     if (!email) throw new ApiError("Email is required", 400);
     const result = await forgetPassword(email);
     res.status(200).json(result);
-  }
+  },
 );
 
 //**************Reset Password***************//
@@ -185,7 +185,7 @@ export const resetPasswordController = asyncHandler(
 
     const result = await resetPassword(token, password);
     res.status(200).json(result);
-  }
+  },
 );
 
 //**************Refresh Token***************//
@@ -198,6 +198,13 @@ export const refreshTokenController = asyncHandler(
     }
     const result = await refreshToken(token);
 
+    res.cookie("accessToken", result.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 15 * 60 * 1000,
+    });
+
     res.cookie("refreshToken", result.refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -209,7 +216,7 @@ export const refreshTokenController = asyncHandler(
       message: "Token refreshed successfully",
       accessToken: result.accessToken,
     });
-  }
+  },
 );
 
 //**************logout***************//
@@ -233,5 +240,5 @@ export const logoutController = asyncHandler(
     res.clearCookie("sessionId");
 
     res.status(200).json(result);
-  }
+  },
 );

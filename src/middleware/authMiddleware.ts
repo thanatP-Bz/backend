@@ -10,12 +10,10 @@ import {
 export const requireAuth = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const token = req.cookies.accessToken;
   const sessionId = req.cookies.sessionId;
-
-  console.log(sessionId);
 
   if (!token) {
     throw new ApiError("Token missing", 401);
@@ -28,7 +26,7 @@ export const requireAuth = async (
   try {
     const decoded = jwt.verify(
       token,
-      process.env.JWT_ACCESS_SECRET!
+      process.env.JWT_ACCESS_SECRET!,
     ) as JwtPayload;
 
     if (!decoded._id) {

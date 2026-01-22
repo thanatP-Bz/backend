@@ -14,6 +14,12 @@ export interface IUser {
   twoFactorSecret?: string | undefined;
   twoFactorEnabled: boolean;
   backupCodes?: string[] | undefined;
+
+  //OAuth fields
+  googleId?: string;
+  githubId?: string;
+  authProvider: "local" | "google" | "github";
+  profilePicture?: string;
 }
 
 export interface IUserDocument extends IUser, Document {

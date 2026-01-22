@@ -31,10 +31,20 @@ const userSchema = new Schema<IUser>(
     twoFactorSecret: { type: String },
     twoFactorEnabled: { type: Boolean, default: false },
     backupCodes: [{ type: String }],
+
+    ////OAuth fields
+    googleId: { type: String },
+    githubId: { type: String },
+    authProvider: {
+      type: String,
+      enum: ["local", "google", "github"],
+      default: "local",
+    },
+    profilePicture: { Type: String },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 userSchema.statics.checkEmail = async function (email: string) {

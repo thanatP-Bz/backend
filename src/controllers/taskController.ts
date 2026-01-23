@@ -3,22 +3,25 @@ import { Task } from "../models/taskModel";
 import { asyncHandler } from "../utils/asyncHandler";
 import { ApiError } from "../utils/ApiError";
 import mongoose from "mongoose";
+import { IUserDocument } from "../types/user";
 
 const createTask = asyncHandler(async (req: Request, res: Response) => {
   const { title, description, isCompleted } = req.body;
+  const user = req.user as IUserDocument;
 
   const task = await Task.create({
     title,
     description,
     isCompleted: isCompleted,
-    user: req.user!._id,
+    user: user!._id,
   });
 
   res.status(201).json(task);
 });
 
 const getTask = async (req: Request, res: Response) => {
-  const tasks = await Task.find({ user: req.user!._id });
+  const user = req.user as IUserDocument;
+  const tasks = await Task.find({ user: user!._id });
 
   res.status(200).json(tasks);
 };
@@ -31,8 +34,9 @@ const getTaskById = async (req: Request, res: Response) => {
 };
 const updateTask = async (req: Request, res: Response) => {
   const { id } = req.params;
+  const user = req.user as IUserDocument;
 
-  const task = await Task.findOne({ _id: id, user: req.user!.id });
+  const task = await Task.findOne({ _id: id, user: user!.id });
 
   if (!task) throw new ApiError("task not found", 400);
 

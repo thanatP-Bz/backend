@@ -8,11 +8,13 @@ import {
 } from "../services/2FA.service";
 
 import { ApiError } from "../utils/ApiError";
+import { IUserDocument } from "../types/user";
 
 //enable 2FA
 export const enable2FAController = asyncHandler(
   async (req: Request, res: Response) => {
-    const email = req.user?.email;
+    const user = req.user as IUserDocument;
+    const email = user?.email;
 
     if (!email) {
       throw new ApiError("Unathorized", 401);
@@ -20,13 +22,14 @@ export const enable2FAController = asyncHandler(
 
     const result = await enabled2FA(email);
     return res.status(200).json(result);
-  }
+  },
 );
 
 //verify 2FA
 export const verify2FASetupController = asyncHandler(
   async (req: Request, res: Response) => {
-    const email = req.user?.email;
+    const user = req.user as IUserDocument;
+    const email = user?.email;
     const { token } = req.body;
 
     if (!email) {
@@ -40,13 +43,14 @@ export const verify2FASetupController = asyncHandler(
     const result = await verify2FASetup(email, token);
 
     return res.status(200).json(result);
-  }
+  },
 );
 
 //disable2FA
 export const disable2FAController = asyncHandler(
   async (req: Request, res: Response) => {
-    const email = req.user?.email;
+    const user = req.user as IUserDocument;
+    const email = user?.email;
     const { password } = req.body;
 
     if (!email) {
@@ -59,13 +63,14 @@ export const disable2FAController = asyncHandler(
 
     const result = await disable2FA(email, password);
     return res.status(200).json(result);
-  }
+  },
 );
 
 //regenrate backup codes
 export const regenerateBackendCodesController = asyncHandler(
   async (req: Request, res: Response) => {
-    const email = req.user?.email;
+    const user = req.user as IUserDocument;
+    const email = user?.email;
 
     if (!email) {
       throw new ApiError("Unthorized", 401);
@@ -73,5 +78,5 @@ export const regenerateBackendCodesController = asyncHandler(
 
     const result = await regenerateBackupCodes(email);
     return res.status(200).json(result);
-  }
+  },
 );

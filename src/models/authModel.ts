@@ -12,7 +12,7 @@ const userSchema = new Schema<IUser>(
   {
     name: { type: String, required: true },
     email: { type: String, required: true },
-    password: { type: String, required: true },
+    password: { type: String, required: false },
 
     //verification email
     isVerified: { type: Boolean, default: false },
@@ -40,7 +40,7 @@ const userSchema = new Schema<IUser>(
       enum: ["local", "google", "github"],
       default: "local",
     },
-    profilePicture: { Type: String },
+    profilePicture: { type: String },
   },
   {
     timestamps: true,
@@ -80,6 +80,7 @@ userSchema.statics.login = async function (email: string, password: string) {
 };
 
 userSchema.pre("save", async function (next) {
+  if (!this.password) return next();
   //if password is new or modified
   if (!this.isModified("password")) return next();
 

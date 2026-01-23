@@ -2,7 +2,6 @@
 import { Request, Response } from "express";
 import { handleGoogleCallback } from "../services/oauth.service";
 import { IUserDocument } from "../types/user";
-
 export const googleCallbackController = async (req: Request, res: Response) => {
   try {
     const user = req.user as IUserDocument;
@@ -13,12 +12,23 @@ export const googleCallbackController = async (req: Request, res: Response) => {
 
     const { accessToken, refreshToken } = await handleGoogleCallback(user);
 
-    // Redirect to frontend with tokens
-    res.redirect(
-      `${process.env.FRONTEND_URL}/auth/callback?accessToken=${accessToken}&refreshToken=${refreshToken}`,
+    // Encode user data
+    const userData = encodeURIComponent(
+      JSON.stringify({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        isVerified: user.isVerified,
+        twoFactorEnabled: user.twoFactorEnabled,
+        authProvider: user.authProvider,
+        profilePicture: user.profilePicture,
+      }),
     );
+
+    const redirectUrl = `${process.env.FRONTEND_URL}/auth/callback?accessToken=${accessToken}&refreshToken=${refreshToken}&user=${userData}`;
+
+    res.redirect(redirectUrl);
   } catch (error) {
-    console.error("OAuth callback error:", error);
     res.redirect(`${process.env.FRONTEND_URL}/login?error=server_error`);
   }
 };

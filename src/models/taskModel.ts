@@ -4,7 +4,7 @@ import { ITask } from "../types/task";
 const taskSchema = new Schema<ITask>(
   {
     title: { type: String, required: true },
-    description: { type: String, required: true },
+    description: { type: String, required: false },
     isCompleted: { type: Boolean, default: false },
     user: {
       type: Schema.Types.ObjectId,
@@ -12,7 +12,7 @@ const taskSchema = new Schema<ITask>(
       required: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export const Task = mongoose.model<ITask>("task", taskSchema);

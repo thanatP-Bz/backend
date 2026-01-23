@@ -2,12 +2,16 @@ import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { User } from "../models/authModel";
 
+console.log("🔍 Google OAuth Config:");
+console.log("Client ID:", process.env.GOOGLE_CLIENT_ID);
+console.log("Callback URL:", process.env.GOOGLE_CALLBACK_URL);
+
 passport.use(
   new GoogleStrategy(
     {
       clientID: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!, // Fixed typo: GOOOLE → GOOGLE
-      callbackURL: process.env.GOOGLE_CALLBACK_URL!, // Fixed typo: callBackURL → callbackURL, GOOOLE_CLIENT_URL → GOOGLE_CALLBACK_URL
+      callbackURL: process.env.GOOGLE_CLIENT_URL!, // Fixed typo: callBackURL → callbackURL, GOOOLE_CLIENT_URL → GOOGLE_CALLBACK_URL
     },
     async (accessToken, refreshToken, profile, done) => {
       try {

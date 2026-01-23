@@ -18,6 +18,7 @@ import {
   verifyEmail,
 } from "../services/verifyEmail.service";
 import { createSession, deactivateSession } from "../services/session.service";
+import { IUserDocument } from "../types/user";
 
 //**************Register***************//
 export const registerController = asyncHandler(
@@ -222,7 +223,8 @@ export const refreshTokenController = asyncHandler(
 //**************logout***************//
 export const logoutController = asyncHandler(
   async (req: Request, res: Response) => {
-    const userId = req.user?._id || req.body.userId;
+    const user = req.user as IUserDocument;
+    const userId = user?._id.toString() || req.body.userId;
 
     //get sessionId from cookie and deactivate it
     const sessionId = req.cookies.sessionId;

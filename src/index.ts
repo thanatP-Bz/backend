@@ -5,10 +5,12 @@ import cors from "cors";
 import connectDB from "./config/connectDB";
 import authRoutes from "./routes/authRoutes";
 import taskRoutes from "./routes/taskRoutes";
+import oauthRoutes from "./routes/oauthRoutes";
 import twoFactorRoutes from "./routes/2FARoutes";
 import { errHandler } from "./middleware/errorHandler";
 import cookieParser from "cookie-parser";
 import session from "express-session";
+import passport from "../src/config/passport";
 
 const app = express();
 
@@ -25,20 +27,25 @@ app.use(
       sameSite: "lax",
       maxAge: 1000 * 60 * 60 * 24 * 7,
     },
-  })
+  }),
 );
 app.use(express.json());
+
+//add passport intialization
+app.use(passport.initialize());
+
 app.use(
   cors({
     origin: "http://localhost:3000",
     credentials: true,
-  })
+  }),
 );
 
 //router
 app.use("/api/auth", authRoutes);
 app.use("/api/task", taskRoutes);
-app.use("/api/auth/2fa", twoFactorRoutes);
+app.use("/api/2fa", twoFactorRoutes);
+app.use("/api/auth", oauthRoutes);
 
 //errorHanlder
 app.use(errHandler);

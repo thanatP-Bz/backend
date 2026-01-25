@@ -17,7 +17,7 @@ export const enable2FAController = asyncHandler(
     const email = user?.email;
 
     if (!email) {
-      throw new ApiError("Unathorized", 401);
+      throw new ApiError("Unauthorized", 401);
     }
 
     const result = await enabled2FA(email);
@@ -73,7 +73,7 @@ export const regenerateBackendCodesController = asyncHandler(
     const email = user?.email;
 
     if (!email) {
-      throw new ApiError("Unthorized", 401);
+      throw new ApiError("Unathorized", 401);
     }
 
     const result = await regenerateBackupCodes(email);

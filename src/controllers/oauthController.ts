@@ -2,6 +2,8 @@
 import { Request, Response } from "express";
 import { handleGoogleCallback } from "../services/oauth.service";
 import { IUserDocument } from "../types/user";
+import { createSession } from "../services/session.service";
+
 export const googleCallbackController = async (req: Request, res: Response) => {
   try {
     const user = req.user as IUserDocument;
@@ -11,6 +13,13 @@ export const googleCallbackController = async (req: Request, res: Response) => {
     }
 
     const { accessToken, refreshToken } = await handleGoogleCallback(user);
+
+    // ✅ NEW: Create session for OAuth login (same as regular login)
+    const session = await createSession({
+      userId: user._id.toString(),
+      ipAddress: req.ip || req.socket.remoteAddress || "unknown",
+      userAgent: req.headers["user-agent"] || "unknown",
+    });
 
     // Encode user data
     const userData = encodeURIComponent(
@@ -25,7 +34,8 @@ export const googleCallbackController = async (req: Request, res: Response) => {
       }),
     );
 
-    const redirectUrl = `${process.env.FRONTEND_URL}/auth/callback?accessToken=${accessToken}&refreshToken=${refreshToken}&user=${userData}`;
+    // ✅ NEW: Include sessionId in redirect URL
+    const redirectUrl = `${process.env.FRONTEND_URL}/auth/callback?accessToken=${accessToken}&refreshToken=${refreshToken}&sessionId=${session._id.toString()}&user=${userData}`;
 
     res.redirect(redirectUrl);
   } catch (error) {

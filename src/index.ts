@@ -23,20 +23,21 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production", // ✅ Updated for production
+      sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax", // ✅ Updated
       maxAge: 1000 * 60 * 60 * 24 * 7,
     },
   }),
 );
 app.use(express.json());
 
-//add passport intialization
+//add passport initialization
 app.use(passport.initialize());
 
+// ✅ Updated CORS for production
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: process.env.FRONTEND_URL || "http://localhost:5173",
     credentials: true,
   }),
 );
@@ -47,7 +48,7 @@ app.use("/api/task", taskRoutes);
 app.use("/api/2fa", twoFactorRoutes);
 app.use("/api/auth", oauthRoutes);
 
-//errorHanlder
+//errorHandler
 app.use(errHandler);
 
 app.get("/", (req: Request, res: Response) => {
@@ -61,7 +62,7 @@ const serverStart = async () => {
   await connectDB(MONGO_URI);
 
   app.listen(PORT, () => {
-    console.log(`listenning to port ${PORT}`);
+    console.log(`Listening to port ${PORT}`); // ✅ Fixed typo
   });
 
   console.log(process.env.PORT);

@@ -9,6 +9,7 @@ import {
 
 import { ApiError } from "../utils/ApiError";
 import { IUserDocument } from "../types/user";
+import { User } from "../models/authModel";
 
 //enable 2FA
 export const enable2FAController = asyncHandler(
@@ -36,6 +37,11 @@ export const verify2FASetupController = asyncHandler(
       throw new ApiError("Unauthorized", 401);
     }
 
+    // ✅ ADD THIS: Prevent OAuth users from enabling 2FA
+    if (!user.password) {
+      throw new ApiError("Cannot enable 2FA. You signed in with Google.", 400);
+    }
+
     if (!token) {
       throw new ApiError("token is required");
     }
@@ -49,19 +55,33 @@ export const verify2FASetupController = asyncHandler(
 //disable2FA
 export const disable2FAController = asyncHandler(
   async (req: Request, res: Response) => {
-    const user = req.user as IUserDocument;
-    const email = user?.email;
-    const { password } = req.body;
+    const authUser = req.user as { email?: string };
 
-    if (!email) {
+    if (!authUser?.email) {
       throw new ApiError("Unauthorized", 401);
     }
+
+    // 🔥 Fetch full user from DB
+    const user = await User.findOne({ email: authUser.email });
+
+    if (!user) {
+      throw new ApiError("User not found", 404);
+    }
+
+    console.log("🔍 User authProvider:", user.authProvider);
+
+    if (user.authProvider === "google") {
+      const result = await disable2FA(user.email, null);
+      return res.status(200).json(result);
+    }
+
+    const { password } = req.body;
 
     if (!password) {
       throw new ApiError("Password is required", 401);
     }
 
-    const result = await disable2FA(email, password);
+    const result = await disable2FA(user.email, password);
     return res.status(200).json(result);
   },
 );

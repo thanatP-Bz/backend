@@ -19,24 +19,28 @@ const createTask = asyncHandler(async (req: Request, res: Response) => {
   res.status(201).json(task);
 });
 
-const getTask = async (req: Request, res: Response) => {
+// ✅ Added asyncHandler
+const getTask = asyncHandler(async (req: Request, res: Response) => {
   const user = req.user as IUserDocument;
   const tasks = await Task.find({ user: user!._id });
 
   res.status(200).json(tasks);
-};
+});
 
-const getTaskById = async (req: Request, res: Response) => {
+// ✅ Added asyncHandler
+const getTaskById = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
   const task = await Task.findById(id);
 
   res.status(200).json(task);
-};
-const updateTask = async (req: Request, res: Response) => {
+});
+
+// ✅ Added asyncHandler
+const updateTask = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
   const user = req.user as IUserDocument;
 
-  const task = await Task.findOne({ _id: id, user: user!.id });
+  const task = await Task.findOne({ _id: id, user: user!._id }); // ✅ Fixed: user!.id → user!._id
 
   if (!task) throw new ApiError("task not found", 400);
 
@@ -45,12 +49,13 @@ const updateTask = async (req: Request, res: Response) => {
   if (description !== undefined) task.description = description;
   if (isCompleted !== undefined) task.isCompleted = isCompleted;
 
-  const updateTask = await task.save();
+  const updatedTask = await task.save(); // ✅ Fixed variable name
 
-  res.status(200).json(updateTask);
-};
+  res.status(200).json(updatedTask);
+});
 
-const deleteTask = async (req: Request, res: Response) => {
+// ✅ Added asyncHandler
+const deleteTask = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(id as string)) {
@@ -63,6 +68,6 @@ const deleteTask = async (req: Request, res: Response) => {
   }
 
   res.status(200).json(task);
-};
+});
 
 export { createTask, getTask, getTaskById, updateTask, deleteTask };

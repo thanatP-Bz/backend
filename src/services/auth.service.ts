@@ -101,9 +101,11 @@ export const login = async (data: IUser) => {
       _id: user._id,
       name: user.name,
       email: user.email,
+      hasPassword: !!user.password,
     },
   };
 };
+
 /* verify 2FA login */
 export const verify2FALogin = async (userId: string, token: string) => {
   const user = (await User.findById(userId)) as IUserDocument;

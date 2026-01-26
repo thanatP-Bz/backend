@@ -39,6 +39,6 @@ router.post("/reset-password/:token", resetPasswordController);
 router.post("/refresh-token", refreshTokenController);
 
 //log out
-router.post("/logout", logoutController);
+router.post("/logout", requireAuth, logoutController);
 
 export default router;

@@ -15,5 +15,18 @@ export const handleGoogleCallback = async (user: IUserDocument) => {
   user.refreshTokenExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
   await user.save();
 
-  return { accessToken, refreshToken };
+  console.log(user.hasPassword);
+
+  return {
+    accessToken,
+    refreshToken,
+    user: {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      twoFactorEnabled: user.twoFactorEnabled,
+      isVerified: user.isVerified,
+      hasPassword: !!user.password,
+    },
+  };
 };

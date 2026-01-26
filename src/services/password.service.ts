@@ -13,12 +13,20 @@ import {
 export const changePassword = async (
   email: string,
   oldPassword: string,
-  newPassword: string
+  newPassword: string,
 ) => {
   const user = await User.findOne({ email });
 
   if (!user) {
     throw new ApiError("user not found", 404);
+  }
+
+  // ✅ Prevent OAuth users from changing password
+  if (!user.password) {
+    throw new ApiError(
+      "Cannot change password. You signed in with Google.",
+      400,
+    );
   }
 
   const match = await bcrypt.compare(oldPassword, user.password);

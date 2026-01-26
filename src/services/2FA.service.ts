@@ -135,7 +135,7 @@ export const verify2FAToken = async (
 };
 
 //disable 2FA for user
-export const disable2FA = async (email: string, password: string) => {
+export const disable2FA = async (email: string, password: string | null) => {
   const user = await User.findOne({ email });
 
   if (!user) {
@@ -146,15 +146,40 @@ export const disable2FA = async (email: string, password: string) => {
     throw new ApiError("2FA is not enabled", 400);
   }
 
-  //verify password before disabling
-  const match = await bcrypt.compare(password, user.password);
+  // ✅ Check if user is OAuth user (no password required)
+  if (user.authProvider === "google") {
+    // OAuth users don't have passwords, skip password check
+    user.twoFactorEnabled = false;
+    user.twoFactorSecret = undefined;
+    user.backupCodes = [];
+    await user.save();
+
+    return {
+      message: "2FA disable successfully!",
+      twoFactorEnabled: false,
+    };
+  }
+
+  // For regular email/password users, verify password
+  if (!password) {
+    throw new ApiError("Password is required", 400);
+  }
+
+  if (!user.password) {
+    throw new ApiError("User has no password set", 400);
+  }
+
+  //verify password before disabling (password is guaranteed to be string here)
+  const match = await bcrypt.compare(password as string, user.password);
 
   if (!match) {
     throw new ApiError("Incorrect Password", 400);
   }
 
-  //disable 2FA
+  //disable 2FA and clean up all 2FA data
   user.twoFactorEnabled = false;
+  user.twoFactorSecret = undefined; // ✅ ADDED: Clear the secret
+  user.backupCodes = []; // ✅ ADDED: Clear backup codes
   await user.save();
 
   return {

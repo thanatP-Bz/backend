@@ -31,6 +31,7 @@ export const googleCallbackController = async (req: Request, res: Response) => {
         twoFactorEnabled: user.twoFactorEnabled,
         authProvider: user.authProvider,
         profilePicture: user.profilePicture,
+        hasPassword: !!user.password,
       }),
     );
 

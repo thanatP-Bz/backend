@@ -13,6 +13,7 @@ const userSchema = new Schema<IUser>(
     name: { type: String, required: true },
     email: { type: String, required: true },
     password: { type: String, required: false },
+    hasPassword: { type: Boolean },
 
     //verification email
     isVerified: { type: Boolean, default: false },
@@ -63,7 +64,7 @@ userSchema.statics.login = async function (email: string, password: string) {
   const user = await this.findOne({ email });
 
   if (!user) {
-    throw new ApiError("incorrect Email", 400);
+    throw new ApiError("Email Not Found", 400);
   }
 
   if (!user.isVerified) {

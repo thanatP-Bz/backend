@@ -9,7 +9,7 @@ export const generateAccessToken = (userId: string) => {
   }
 
   return jwt.sign({ _id: userId }, secret, {
-    expiresIn: "7d",
+    expiresIn: "15min",
   });
 };
 

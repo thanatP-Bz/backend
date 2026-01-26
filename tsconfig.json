@@ -5,6 +5,7 @@
     "rootDir": "./src",
     "outDir": "./dist",
     "typeRoots": ["./src/types", "./node_modules/@types"],
+    "moduleResolution": "node",
 
     // Environment Settings
     // See also https://aka.ms/tsconfig/module

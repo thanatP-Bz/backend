@@ -10,7 +10,7 @@ import twoFactorRoutes from "./routes/2FARoutes";
 import { errHandler } from "./middleware/errorHandler";
 import cookieParser from "cookie-parser";
 import session from "express-session";
-import passport from "../src/config/passport";
+import passport from "./config/passport";
 
 const app = express();
 

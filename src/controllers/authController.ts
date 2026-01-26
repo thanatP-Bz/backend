@@ -68,16 +68,17 @@ export const loginController = asyncHandler(
       userAgent: req.headers["user-agent"] || "unknown",
     });
 
+    // ✅ FIXED - Cross-origin cookie settings
     res.cookie("accessToken", result.accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
       sameSite: "lax",
       maxAge: 15 * 60 * 1000,
     });
 
     res.cookie("refreshToken", result.refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
       sameSite: "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
@@ -85,7 +86,7 @@ export const loginController = asyncHandler(
     //set sessionId cookie
     res.cookie("sessionId", session._id.toString(), {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
       sameSite: "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
@@ -115,16 +116,17 @@ export const verify2FALoginController = asyncHandler(
       userAgent: req.headers["user-agent"] || "unknown",
     });
 
+    // ✅ FIXED - Cross-origin cookie settings
     res.cookie("accessToken", result.accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
       sameSite: "lax",
       maxAge: 15 * 60 * 1000,
     });
 
     res.cookie("refreshToken", result.refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
       sameSite: "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
@@ -132,7 +134,7 @@ export const verify2FALoginController = asyncHandler(
     //set sessionId cookie
     res.cookie("sessionId", session._id.toString(), {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
       sameSite: "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
@@ -199,16 +201,17 @@ export const refreshTokenController = asyncHandler(
     }
     const result = await refreshToken(token);
 
+    // ✅ FIXED - Cross-origin cookie settings
     res.cookie("accessToken", result.accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
       sameSite: "lax",
       maxAge: 15 * 60 * 1000,
     });
 
     res.cookie("refreshToken", result.refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
       sameSite: "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });

@@ -1,7 +1,6 @@
 import env from "dotenv";
 env.config();
 import express, { Request, Response } from "express";
-import cors from "cors";
 import connectDB from "./config/connectDB";
 import authRoutes from "./routes/authRoutes";
 import taskRoutes from "./routes/taskRoutes";
@@ -14,21 +13,34 @@ import passport from "./config/passport";
 
 const app = express();
 
-// ✅ CORS configuration
-const corsOptions = {
-  origin: "http://localhost:5173",
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  exposedHeaders: ["Set-Cookie"],
-  maxAge: 86400, // Cache preflight for 24 hours
-};
+// ===== CORS - Manual headers ONLY (remove cors() package) =====
+const allowedOrigins = [
+  "http://localhost:5173", // Local development
+  "https://mern-auth-frontend-rozs.onrender.com", // Production
+];
 
-app.use(cors(corsOptions));
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin && allowedOrigins.includes(origin)) {
+    res.header("Access-Control-Allow-Origin", origin);
+  }
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header(
+    "Access-Control-Allow-Methods",
+    "GET,POST,PUT,DELETE,PATCH,OPTIONS",
+  );
+  res.header("Access-Control-Allow-Headers", "Content-Type,Authorization");
 
-// Middleware
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+  next();
+});
+
+// ===== Middleware =====
 app.use(cookieParser());
 app.use(express.json());
+
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "SESSION_SECRET",
@@ -43,17 +55,15 @@ app.use(
   }),
 );
 
-// Passport initialization
 app.use(passport.initialize());
-/* app.use(passport.session()); */
 
-// Routes
+// ===== Routes =====
 app.use("/api/auth", authRoutes);
 app.use("/api/task", taskRoutes);
 app.use("/api/2fa", twoFactorRoutes);
-app.use("/api/auth", oauthRoutes);
+app.use("/api/oauth", oauthRoutes); // ✅ Changed to /api/oauth
 
-// Error handler (always last)
+// ===== Error Handler (always last) =====
 app.use(errHandler);
 
 app.get("/", (req: Request, res: Response) => {
@@ -65,9 +75,9 @@ const MONGO_URI = process.env.MONGO_URI as string;
 
 const serverStart = async () => {
   await connectDB(MONGO_URI);
-
   app.listen(PORT, () => {
-    console.log(`Listening to port ${PORT}`);
+    console.log(`✅ Server running on port ${PORT}`);
+    console.log(`🌍 Environment: ${process.env.NODE_ENV || "development"}`);
   });
 };
 

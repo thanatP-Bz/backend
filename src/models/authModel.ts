@@ -71,6 +71,13 @@ userSchema.statics.login = async function (email: string, password: string) {
     throw new ApiError("Please verify your email before logging in", 403);
   }
 
+  if (!user.password) {
+    throw new ApiError(
+      "This account uses Google login. Please use 'Continue with Google'",
+      400,
+    );
+  }
+
   const match = await bcrypt.compare(password, user.password);
 
   if (!match) {

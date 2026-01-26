@@ -77,6 +77,14 @@ export const login = async (data: IUser) => {
 
   const user = (await User.login(email, password)) as IUserDocument;
 
+  // ✅ ADD THIS CHECK - Google users don't have passwords
+  if (!user.password) {
+    throw new ApiError(
+      "This account uses Google login. Please sign in with Google.",
+      400,
+    );
+  }
+
   //check is 2FA is enable
   if (user.twoFactorEnabled) {
     return {

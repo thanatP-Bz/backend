@@ -80,7 +80,12 @@ export const forgetPassword = async (email: string) => {
   try {
     const emailContent = getPasswordResetEmail(resetUrl, user.name);
 
-    await sendEmail(user.email, emailContent.subject, emailContent.html);
+    await sendEmail({
+      to: user.email,
+      subject: emailContent.subject,
+      html: emailContent.html,
+      text: emailContent.text,
+    });
 
     return { message: "Reset link sent" };
   } catch (error) {
@@ -113,10 +118,10 @@ export const resetPassword = async (token: string, password: string) => {
   await user.save();
 
   // Send confirmation email (non-blocking)
-  const { subject, html } = getPasswordResetConfirmationEmail(
-    user.name || user.email,
-  );
-  sendEmail(user.email, subject, html).catch(console.error);
+  sendEmail({
+    to: user.email,
+    ...getPasswordResetConfirmationEmail(user.name || user.email),
+  }).catch(console.error);
 
   return { message: "Password reset successful" };
 };

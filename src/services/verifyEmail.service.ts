@@ -70,7 +70,12 @@ export const resendVerificationEmail = async (email: string) => {
   try {
     const emailContent = getVerificationEmail(verificationUrl, user.name);
 
-    await sendEmail(user.email, emailContent.subject, emailContent.html);
+    await sendEmail({
+      to: user.email,
+      subject: emailContent.subject,
+      html: emailContent.html,
+      text: emailContent.text,
+    });
 
     return { message: "Verification email resent" };
   } catch (error) {

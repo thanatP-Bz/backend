@@ -1,20 +1,26 @@
-import { Resend } from "resend";
+import { transporter } from "./email";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+interface EmailOption {
+  to: string;
+  subject: string;
+  html: string;
+  text?: string;
+}
 
-export const sendEmail = async (to: string, subject: string, html: string) => {
+export const sendEmail = async (options: EmailOption): Promise<void> => {
   try {
-    const data = await resend.emails.send({
-      from: "Your App <onboarding@resend.dev>", // Use this for testing
-      to: [to],
-      subject: subject,
-      html: html,
-    });
+    const mailOptions = {
+      from: `"Your App Name" <${process.env.EMAIL_USER}>`,
+      to: options.to,
+      subject: options.subject,
+      html: options.html,
+      text: options.text || "",
+    };
 
-    console.log("✅ Email sent successfully:", data);
-    return data;
+    const info = await transporter.sendMail(mailOptions);
+    console.log("✅ Email sent:", info.messageId);
   } catch (error) {
     console.error("❌ Error sending email:", error);
-    throw error;
+    throw new Error("Failed to send email");
   }
 };

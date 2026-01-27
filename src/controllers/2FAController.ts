@@ -37,8 +37,7 @@ export const verify2FASetupController = asyncHandler(
       throw new ApiError("Unauthorized", 401);
     }
 
-    // ✅ ADD THIS: Prevent OAuth users from enabling 2FA
-    if (!user.password) {
+    if (user.authProvider === "google") {
       throw new ApiError("Cannot enable 2FA. You signed in with Google.", 400);
     }
 

@@ -47,12 +47,7 @@ export const register = async (data: IUser) => {
       newUser.name || newUser.email,
     );
 
-    await sendEmail({
-      to: newUser.email,
-      subject: emailContent.subject,
-      html: emailContent.html,
-      text: emailContent.text,
-    });
+    await sendEmail(newUser.email, emailContent.subject, emailContent.html);
 
     return {
       user: {

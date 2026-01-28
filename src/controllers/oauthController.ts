@@ -36,7 +36,7 @@ export const googleCallbackController = async (req: Request, res: Response) => {
     );
 
     // ✅ NEW: Include sessionId in redirect URL
-    const redirectUrl = `${process.env.FRONTEND_URL}/oauth/callback?accessToken=${accessToken}&refreshToken=${refreshToken}&sessionId=${session._id.toString()}&user=${userData}`;
+    const redirectUrl = `${"https://mern-auth-frontend-rozs.onrender.com"}/oauth/callback?accessToken=${accessToken}&refreshToken=${refreshToken}&sessionId=${session._id.toString()}&user=${userData}`;
 
     res.redirect(redirectUrl);
   } catch (error) {

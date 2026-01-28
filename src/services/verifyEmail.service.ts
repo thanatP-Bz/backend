@@ -2,7 +2,7 @@ import { User } from "../models/authModel";
 import { ApiError } from "../utils/ApiError";
 import crypto from "crypto";
 import { getVerificationEmail } from "../utils/emailTemplate";
-import { sendEmail } from "../utils/sendEmail";
+/* import { sendEmail } from "../utils/sendEmail"; */
 //**************verify Email***************//
 export const verifyEmail = async (token: string) => {
   // Now try the normal query
@@ -70,12 +70,12 @@ export const resendVerificationEmail = async (email: string) => {
   try {
     const emailContent = getVerificationEmail(verificationUrl, user.name);
 
-    await sendEmail({
+    /*     await sendEmail({
       to: user.email,
       subject: emailContent.subject,
       html: emailContent.html,
       text: emailContent.text,
-    });
+    }); */
 
     return { message: "Verification email resent" };
   } catch (error) {

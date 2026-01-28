@@ -1,5 +1,5 @@
 import { ApiError } from "../utils/ApiError";
-import { sendEmail } from "../utils/sendEmail";
+/* import { sendEmail } from "../utils/sendEmail"; */
 import { User } from "../models/authModel";
 import crypto from "crypto";
 import bcrypt from "bcrypt";
@@ -80,12 +80,12 @@ export const forgetPassword = async (email: string) => {
   try {
     const emailContent = getPasswordResetEmail(resetUrl, user.name);
 
-    await sendEmail({
+    /*     await sendEmail({
       to: user.email,
       subject: emailContent.subject,
       html: emailContent.html,
       text: emailContent.text,
-    });
+    }); */
 
     return { message: "Reset link sent" };
   } catch (error) {
@@ -118,10 +118,10 @@ export const resetPassword = async (token: string, password: string) => {
   await user.save();
 
   // Send confirmation email (non-blocking)
-  sendEmail({
+  /*   sendEmail({
     to: user.email,
     ...getPasswordResetConfirmationEmail(user.name || user.email),
-  }).catch(console.error);
+  }).catch(console.error); */
 
   return { message: "Password reset successful" };
 };

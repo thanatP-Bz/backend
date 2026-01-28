@@ -1,4 +1,4 @@
-import { transporter } from "./email";
+/* import { transporter } from "./email";
 
 interface EmailOption {
   to: string;
@@ -24,3 +24,4 @@ export const sendEmail = async (options: EmailOption): Promise<void> => {
     throw new Error("Failed to send email");
   }
 };
+ */

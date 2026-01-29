@@ -1,6 +1,9 @@
 import express from "express";
 import passport from "../config/passport";
-import { googleCallbackController } from "../controllers/oauthController";
+import {
+  googleCallbackController,
+  exchangeTokenController,
+} from "../controllers/oauthController";
 
 const router = express.Router();
 
@@ -20,5 +23,7 @@ router.get(
   }),
   googleCallbackController,
 );
+
+router.post("/exchange-token", exchangeTokenController);
 
 export default router;

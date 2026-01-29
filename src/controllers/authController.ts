@@ -74,7 +74,6 @@ export const loginController = asyncHandler(
       secure: true,
       sameSite: "none",
       maxAge: 15 * 60 * 1000,
-      domain: ".onrender.com",
     });
 
     res.cookie("refreshToken", result.refreshToken, {
@@ -82,7 +81,6 @@ export const loginController = asyncHandler(
       secure: true,
       sameSite: "none",
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      domain: ".onrender.com",
     });
 
     //set sessionId cookie
@@ -91,7 +89,6 @@ export const loginController = asyncHandler(
       secure: true,
       sameSite: "none",
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      domain: ".onrender.com",
     });
 
     res.status(200).json({

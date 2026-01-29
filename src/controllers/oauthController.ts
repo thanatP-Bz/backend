@@ -24,26 +24,29 @@ export const googleCallbackController = async (req: Request, res: Response) => {
     // ✅ SET COOKIES FROM BACKEND (httpOnly for security)
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // true in production
+      secure: true, // true in production
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       path: "/",
+      domain: ".onrender.com",
     });
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       path: "/",
+      domain: ".onrender.com",
     });
 
     res.cookie("sessionId", session._id.toString(), {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       path: "/",
+      domain: ".onrender.com",
     });
 
     // Encode only user data (no tokens in URL anymore!)

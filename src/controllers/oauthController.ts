@@ -14,14 +14,39 @@ export const googleCallbackController = async (req: Request, res: Response) => {
 
     const { accessToken, refreshToken } = await handleGoogleCallback(user);
 
-    // ✅ NEW: Create session for OAuth login (same as regular login)
+    // Create session for OAuth login
     const session = await createSession({
       userId: user._id.toString(),
       ipAddress: req.ip || req.socket.remoteAddress || "unknown",
       userAgent: req.headers["user-agent"] || "unknown",
     });
 
-    // Encode user data
+    // ✅ SET COOKIES FROM BACKEND (httpOnly for security)
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // true in production
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      path: "/",
+    });
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      path: "/",
+    });
+
+    res.cookie("sessionId", session._id.toString(), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      path: "/",
+    });
+
+    // Encode only user data (no tokens in URL anymore!)
     const userData = encodeURIComponent(
       JSON.stringify({
         _id: user._id,
@@ -35,8 +60,8 @@ export const googleCallbackController = async (req: Request, res: Response) => {
       }),
     );
 
-    // ✅ NEW: Include sessionId in redirect URL
-    const redirectUrl = `${process.env.FRONTEND_URL}/oauth/callback?accessToken=${accessToken}&refreshToken=${refreshToken}&sessionId=${session._id.toString()}&user=${userData}`;
+    // ✅ Redirect with ONLY user data (cookies are set automatically)
+    const redirectUrl = `${process.env.FRONTEND_URL}/oauth/callback?user=${userData}`;
 
     res.redirect(redirectUrl);
   } catch (error) {

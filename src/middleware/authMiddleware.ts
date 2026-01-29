@@ -12,8 +12,24 @@ export const requireAuth = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const token = req.cookies.accessToken;
-  const sessionId = req.cookies.sessionId;
+  // ✅ Check Authorization header first, then cookies
+  const authHeader = req.headers.authorization;
+  let token: string | undefined;
+
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    token = authHeader.substring(7); // Remove "Bearer " prefix
+  } else {
+    token = req.cookies.accessToken; // Fallback to cookies
+  }
+
+  // ✅ Get sessionId from header or cookie
+  let sessionId: string | undefined;
+
+  if (req.headers["x-session-id"]) {
+    sessionId = req.headers["x-session-id"] as string;
+  } else {
+    sessionId = req.cookies.sessionId;
+  }
 
   if (!token) {
     throw new ApiError("Token missing", 401);
@@ -34,7 +50,7 @@ export const requireAuth = async (
       throw new ApiError("Invalid token payload", 401);
     }
 
-    //check session Valid
+    // Check session valid
     const sessionValid = await isSessionValid(sessionId);
 
     if (!sessionValid) {
@@ -50,7 +66,7 @@ export const requireAuth = async (
       throw new ApiError("User not found", 404);
     }
 
-    //update session activity
+    // Update session activity
     await updateSessionActivity(sessionId);
 
     req.user = user;

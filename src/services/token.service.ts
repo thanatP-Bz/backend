@@ -4,7 +4,7 @@ import {
   verifyRefreshToken,
   generateAccessToken,
   generateRefreshToken,
-} from "../utils/generateToken";
+} from "../utils/token/generateToken";
 import { JwtPayload } from "jsonwebtoken";
 
 export const refreshToken = async (refreshToken: string) => {

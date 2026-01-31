@@ -3,7 +3,7 @@ import { IUserDocument } from "../types/user";
 import {
   generateAccessToken,
   generateRefreshToken,
-} from "../utils/generateToken";
+} from "../utils/token/generateToken";
 
 export const handleGoogleCallback = async (user: IUserDocument) => {
   // Generate tokens

@@ -3,11 +3,11 @@ import { User } from "../models/authModel";
 import {
   generateAccessToken,
   generateRefreshToken,
-} from "../utils/generateToken";
+} from "../utils/token/generateToken";
 import { ApiError } from "../utils/ApiError";
 import crypto from "crypto";
-import { getVerificationEmail } from "../utils/emailTemplate";
-/* import { sendEmail } from "../utils/sendEmail"; */
+import { getVerificationEmail } from "../utils/email/emailTemplate";
+import { sendEmail } from "../utils/email/sendEmail";
 import { verify2FAToken } from "./2FA.service";
 
 export const register = async (data: IUser) => {
@@ -46,13 +46,13 @@ export const register = async (data: IUser) => {
       verificationUrl,
       newUser.name || newUser.email,
     );
-    /* 
+
     await sendEmail({
       to: newUser.email,
       subject: emailContent.subject,
       html: emailContent.html,
       text: emailContent.text,
-    }); */
+    });
 
     return {
       user: {

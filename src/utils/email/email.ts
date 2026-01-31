@@ -1,4 +1,4 @@
-/* import nodemailer from "nodemailer";
+import nodemailer from "nodemailer";
 
 export const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
@@ -17,4 +17,3 @@ transporter.verify((error, success) => {
     console.log(`✅ Email server is ready to send messages`);
   }
 });
- */

@@ -8,7 +8,6 @@ import oauthRoutes from "./routes/oauthRoutes";
 import twoFactorRoutes from "./routes/2FARoutes";
 import { errHandler } from "./middleware/errorHandler";
 import cookieParser from "cookie-parser";
-import session from "express-session";
 import passport from "./config/passport";
 
 const app = express();
@@ -43,20 +42,6 @@ app.use((req, res, next) => {
 // ===== Middleware =====
 app.use(cookieParser());
 app.use(express.json());
-
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || "SESSION_SECRET",
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: 1000 * 60 * 60 * 24 * 7,
-    },
-  }),
-);
 
 app.use(passport.initialize());
 

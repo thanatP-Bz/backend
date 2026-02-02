@@ -57,14 +57,14 @@ export const forgetPassword = async (email: string) => {
   }
 
   // ✅ Cooldown FIRST
-  if (
+  /*   if (
     user.resetPasswordExpiry &&
     user.resetPasswordExpiry.getTime() > Date.now()
   ) {
     return {
       message: "Reset email already sent. Please check your inbox.",
     };
-  }
+  } */
 
   // ✅ Generate token
   const { resetToken, hashedToken } = generateResetToken();
@@ -79,6 +79,11 @@ export const forgetPassword = async (email: string) => {
 
   try {
     const emailContent = getPasswordResetEmail(resetUrl, user.name);
+
+    console.log("Environment check:");
+    console.log("NODE_ENV:", process.env.NODE_ENV);
+    console.log("FRONTEND_URL:", process.env.FRONTEND_URL);
+    console.log("Generated resetUrl:", resetUrl);
 
     await sendEmail({
       to: user.email,

@@ -7,7 +7,7 @@ import {
 import { ApiError } from "../utils/ApiError";
 import crypto from "crypto";
 import { getVerificationEmail } from "../utils/email/emailTemplate";
-import { sendEmail } from "../utils/email/sendEmail";
+import { sendEmail } from "../utils/email(Resend)/sendEmail";
 import { verify2FAToken } from "./2FA.service";
 
 export const register = async (data: IUser) => {

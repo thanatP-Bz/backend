@@ -2,7 +2,7 @@ import { User } from "../models/authModel";
 import { ApiError } from "../utils/ApiError";
 import crypto from "crypto";
 import { getVerificationEmail } from "../utils/email/emailTemplate";
-import { sendEmail } from "../utils/email/sendEmail";
+import { sendEmail } from "../utils/email(Resend)/sendEmail";
 //**************verify Email***************//
 export const verifyEmail = async (token: string) => {
   // Now try the normal query

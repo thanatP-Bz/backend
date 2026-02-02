@@ -24,6 +24,13 @@ export const sendEmail = async ({
       ...(text && { text }), // Include text version if provided
     });
 
+    console.log("RESEND_API_KEY exists:", !!process.env.RESEND_API_KEY);
+    console.log(
+      "RESEND_API_KEY starts with re_:",
+      process.env.RESEND_API_KEY?.startsWith("re_"),
+    );
+    console.log("RESEND_API_KEY length:", process.env.RESEND_API_KEY?.length);
+
     if (error) {
       console.error("❌ Resend error:", error);
       throw new Error("Failed to send email");

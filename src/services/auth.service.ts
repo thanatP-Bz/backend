@@ -6,7 +6,7 @@ import {
 } from "../utils/token/generateToken";
 import { ApiError } from "../utils/ApiError";
 import crypto from "crypto";
-import { getVerificationEmail } from "../utils/email/emailTemplate";
+import { getVerificationEmail } from "../utils/email(Resend)/emailTemplate";
 import { sendEmail } from "../utils/email(Resend)/sendEmail";
 import { verify2FAToken } from "./2FA.service";
 

@@ -1,5 +1,5 @@
 import { ApiError } from "../utils/ApiError";
-import { sendEmail } from "../utils/email/sendEmail";
+import { sendEmail } from "../utils/email(Resend)/sendEmail";
 import { User } from "../models/authModel";
 import crypto from "crypto";
 import bcrypt from "bcrypt";
@@ -7,7 +7,7 @@ import { generateResetToken } from "../utils/token/generateResetToken";
 import {
   getPasswordResetConfirmationEmail,
   getPasswordResetEmail,
-} from "../utils/email/emailTemplate";
+} from "../utils/email(Resend)/emailTemplate";
 
 //**************reset password***************//
 export const changePassword = async (

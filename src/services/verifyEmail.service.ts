@@ -1,7 +1,7 @@
 import { User } from "../models/authModel";
 import { ApiError } from "../utils/ApiError";
 import crypto from "crypto";
-import { getVerificationEmail } from "../utils/email/emailTemplate";
+import { getVerificationEmail } from "../utils/email(Resend)/emailTemplate";
 import { sendEmail } from "../utils/email(Resend)/sendEmail";
 //**************verify Email***************//
 export const verifyEmail = async (token: string) => {

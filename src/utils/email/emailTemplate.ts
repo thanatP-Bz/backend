@@ -1,4 +1,4 @@
-export const getPasswordResetEmail = (resetUrl: string, userName?: string) => {
+/* export const getPasswordResetEmail = (resetUrl: string, userName?: string) => {
   return {
     subject: "Password Reset Request",
     html: `
@@ -285,3 +285,4 @@ export const getVerificationEmail = (
     `,
   };
 };
+ */

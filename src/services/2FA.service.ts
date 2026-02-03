@@ -22,30 +22,18 @@ export const enabled2FA = async (email: string) => {
     throw new ApiError("2FA is already enabled", 400);
   }
 
-  /* Check if user already has a secret (from previous setup) */
-  let secret;
-  let qrCodeUrl;
+  // ✅ Always generate a fresh secret
+  const secret = speakeasy.generateSecret({
+    name: `TaskApp (${user.email})`,
+    issuer: "TaskApp",
+  });
 
-  if (user.twoFactorSecret) {
-    // ✅ User has existing secret - reuse it!
-    secret = {
-      base32: user.twoFactorSecret,
-      otpauth_url: `otpauth://totp/TaskApp:${user.email}?secret=${user.twoFactorSecret}&issuer=TaskApp`,
-    };
-  } else {
-    // ✅ No existing secret - generate new one
-    secret = speakeasy.generateSecret({
-      name: `TaskApp (${user.email})`,
-      issuer: "TaskApp",
-    });
+  // Save the new secret
+  user.twoFactorSecret = secret.base32;
+  await user.save();
 
-    // Save the new secret
-    user.twoFactorSecret = secret.base32;
-    await user.save();
-  }
-
-  /* Generate QR code from the secret (existing or new) */
-  qrCodeUrl = await qrcode.toDataURL(secret.otpauth_url!);
+  // Generate QR code
+  const qrCodeUrl = await qrcode.toDataURL(secret.otpauth_url!);
 
   return {
     secret: secret.base32,

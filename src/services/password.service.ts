@@ -56,15 +56,22 @@ export const forgetPassword = async (email: string) => {
     };
   }
 
+  if (user.authProvider && user.authProvider !== "local") {
+    throw new ApiError(
+      "Password reset not available. You signed up with Google. Please use Google to sign in.",
+      400,
+    );
+  }
+
   // ✅ Cooldown FIRST
-  /*   if (
+  if (
     user.resetPasswordExpiry &&
     user.resetPasswordExpiry.getTime() > Date.now()
   ) {
     return {
       message: "Reset email already sent. Please check your inbox.",
     };
-  } */
+  }
 
   // ✅ Generate token
   const { resetToken, hashedToken } = generateResetToken();

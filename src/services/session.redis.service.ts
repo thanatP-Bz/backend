@@ -1,4 +1,3 @@
-import { session } from "passport";
 import redis from "../config/redis";
 import { SessionData, CreateSessionInput } from "../types/redisSession";
 

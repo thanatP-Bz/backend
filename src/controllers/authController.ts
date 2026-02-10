@@ -17,7 +17,10 @@ import {
   resendVerificationEmail,
   verifyEmail,
 } from "../services/verifyEmail.service";
-import { createSession, deactivateSession } from "../services/session.service";
+import {
+  createSession,
+  deactivateSession,
+} from "../services/session.redis.service";
 import { IUserDocument } from "../types/user";
 
 //**************Register***************//
@@ -84,7 +87,7 @@ export const loginController = asyncHandler(
     });
 
     //set sessionId cookie
-    res.cookie("sessionId", session._id.toString(), {
+    res.cookie("sessionId", session, {
       httpOnly: true,
       secure: true,
       sameSite: "none",
@@ -132,7 +135,7 @@ export const verify2FALoginController = asyncHandler(
     });
 
     //set sessionId cookie
-    res.cookie("sessionId", session._id.toString(), {
+    res.cookie("sessionId", session, {
       httpOnly: true,
       secure: true,
       sameSite: "none",

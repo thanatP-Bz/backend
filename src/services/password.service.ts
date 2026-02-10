@@ -22,11 +22,12 @@ export const changePassword = async (
   }
 
   // ✅ Prevent OAuth users from changing password
-  if (!user.password) {
-    throw new ApiError(
+  if (user.authProvider === "local") {
+    /*   throw new ApiError(
       "Cannot change password. You signed in with Google.",
       400,
-    );
+    ); */
+    console.log("cannot change password");
   }
 
   const match = await bcrypt.compare(oldPassword, user.password);

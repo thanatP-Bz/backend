@@ -1,10 +1,19 @@
 import Redis from "ioredis";
 
-// If REDIS_URL exists (production), use it directly
+// If REDIS_URL exists (production), use it with TLS config
 if (process.env.REDIS_URL) {
-  var redis = new Redis(process.env.REDIS_URL);
+  var redis = new Redis(process.env.REDIS_URL, {
+    tls: {
+      rejectUnauthorized: false, // Upstash requires this
+    },
+    maxRetriesPerRequest: 3, // Reduce retries
+    retryStrategy: (times: number): number | null => {
+      if (times > 3) return null; // Stop after 3 tries
+      return Math.min(times * 100, 1000);
+    },
+  });
 } else {
-  // Otherwise use individual config (local development)
+  // Local development config
   const redisConfig: any = {
     host: process.env.REDIS_HOST || "localhost",
     port: parseInt(process.env.REDIS_PORT || "6379"),
@@ -14,7 +23,6 @@ if (process.env.REDIS_URL) {
     },
   };
 
-  // Only add password if it exists
   if (process.env.REDIS_PASSWORD) {
     redisConfig.password = process.env.REDIS_PASSWORD;
   }

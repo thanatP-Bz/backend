@@ -3,7 +3,7 @@
 import { Request, Response } from "express";
 import { handleGoogleCallback } from "../services/oauth.service";
 import { IUserDocument } from "../types/user";
-import { createSession } from "../services/session.service";
+import { createSession } from "../services/session.redis.service";
 
 export const googleCallbackController = async (req: Request, res: Response) => {
   try {
@@ -37,7 +37,7 @@ export const googleCallbackController = async (req: Request, res: Response) => {
     );
 
     // ✅ Simple redirect with all data in URL
-    const redirectUrl = `${process.env.FRONTEND_URL}/oauth/callback?accessToken=${accessToken}&refreshToken=${refreshToken}&sessionId=${session._id.toString()}&user=${userData}`;
+    const redirectUrl = `${process.env.FRONTEND_URL}/oauth/callback?accessToken=${accessToken}&refreshToken=${refreshToken}&sessionId=${session}&user=${userData}`;
 
     res.redirect(redirectUrl);
   } catch (error) {

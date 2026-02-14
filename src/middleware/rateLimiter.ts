@@ -29,6 +29,13 @@ export const rateLimiter = (action: keyof typeof RATE_LIMIT) => {
       if (currentAttempts >= limit.max) {
         const ttl = await redis.ttl(key);
 
+        // ✅ Set rateLimit on req even when blocked!
+        req.rateLimit = {
+          limit: limit.max,
+          remaining: 0,
+          window: limit.window,
+        };
+
         res.setHeader("X-RateLimit-Limit", limit.max);
         res.setHeader("X-RateLimit-Remaining", 0);
         res.setHeader("X-RateLimit-Reset", ttl);

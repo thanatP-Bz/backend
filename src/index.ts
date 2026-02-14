@@ -51,12 +51,12 @@ app.use("/api/task", taskRoutes);
 app.use("/api/2fa", twoFactorRoutes);
 app.use("/api/oauth", oauthRoutes); // ✅ Changed to /api/oauth
 
-// ===== Error Handler (always last) =====
-app.use(errHandler);
-
 app.get("/", (req: Request, res: Response) => {
   res.send("hello world");
 });
+
+// ===== Error Handler (always last) =====
+app.use(errHandler);
 
 const PORT = process.env.PORT || 4004;
 const MONGO_URI = process.env.MONGO_URI as string;

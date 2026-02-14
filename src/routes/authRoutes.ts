@@ -12,17 +12,26 @@ import {
   verify2FALoginController,
 } from "../controllers/authController";
 import { requireAuth } from "../middleware/authMiddleware";
+import { rateLimiter } from "../middleware/rateLimiter";
 
 const router = Router();
 
 // Registration
-router.post("/register", registerController);
-
+router.post("/register", rateLimiter("register"), registerController);
 // Login
-router.post("/login", loginController);
-
+router.post("/login", rateLimiter("login"), loginController);
 // verify 2FA login
-router.post("/verify-2fa-login", verify2FALoginController);
+router.post(
+  "/verify-2fa-login",
+  rateLimiter("verify2FA"),
+  verify2FALoginController,
+);
+//change password
+router.post(
+  "/forget-password",
+  rateLimiter("forgetPassword"),
+  forgetPasswordController,
+);
 
 // Email Verification
 router.get("/verify-email", verifyEmailController);
@@ -32,7 +41,6 @@ router.post("/resend-verification", resendVerifyEmailController);
 
 // Password
 router.patch("/change-password", requireAuth, changePasswordController);
-router.post("/forget-password", forgetPasswordController);
 router.post("/reset-password/:token", resetPasswordController);
 
 // Refresh Token

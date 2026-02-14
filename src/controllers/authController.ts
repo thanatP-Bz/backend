@@ -54,6 +54,8 @@ export const loginController = asyncHandler(
   async (req: Request, res: Response) => {
     const result = await login(req.body);
 
+    console.log("🔍 CONTROLLER - req.rateLimit:", req.rateLimit);
+
     //check 2FA
     if ("requires2FA" in result && result.requires2FA) {
       // 2FA required - don't create session or set cookies

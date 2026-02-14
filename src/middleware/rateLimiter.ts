@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from "express";
 import redis from "../config/redis";
 import { ApiError } from "../utils/ApiError";
 
+console.log("✅ rateLimiter.ts loaded!"); // ← Top of file
+
 //define Rate limit for the different actions
 const RATE_LIMIT = {
   login: { max: 5, window: 900 },
@@ -13,6 +15,7 @@ const RATE_LIMIT = {
 //the rate limit function
 export const rateLimiter = (action: keyof typeof RATE_LIMIT) => {
   return async (req: Request, res: Response, next: NextFunction) => {
+    console.log("🔍 rateLimiter called!"); // ← Inside middleware
     try {
       const ip = req.ip || req.socket.remoteAddress || "unknown";
       const key = `ratelimit:${action}:${ip}`;

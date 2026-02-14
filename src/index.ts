@@ -46,6 +46,11 @@ app.use(express.json());
 app.use(passport.initialize());
 
 // ===== Routes =====
+app.use((req, res, next) => {
+  console.log(`📨 ${req.method} ${req.path}`);
+  next();
+});
+
 app.use("/api/auth", authRoutes);
 app.use("/api/task", taskRoutes);
 app.use("/api/2fa", twoFactorRoutes);

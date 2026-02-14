@@ -52,9 +52,9 @@ export const verifyEmailController = asyncHandler(
 //**************Login***************//
 export const loginController = asyncHandler(
   async (req: Request, res: Response) => {
+    console.log("🔍 LOGIN CONTROLLER CALLED!"); // ← Move to TOP!
+    console.log("🔍 req.rateLimit at start:", req.rateLimit);
     const result = await login(req.body);
-
-    console.log("🔍 CONTROLLER - req.rateLimit:", req.rateLimit);
 
     //check 2FA
     if ("requires2FA" in result && result.requires2FA) {

@@ -78,10 +78,3 @@ export const notFound = (
   const error = new AppError(`Route ${req.originalUrl} not found`, 404);
   next(error);
 };
-
-// Async handler wrapper (eliminates try-catch in controllers)
-export const asyncHandler = (fn: Function) => {
-  return (req: Request, res: Response, next: NextFunction) => {
-    Promise.resolve(fn(req, res, next)).catch(next);
-  };
-};

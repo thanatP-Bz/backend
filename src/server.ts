@@ -5,6 +5,8 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
 import authRoutes from "./routes/authRoutes";
+import transactionRoutes from "./routes/transactionRoutes";
+import { errorHandler, notFound } from "./middleware/errorHandler";
 
 // Load environment variables
 dotenv.config();
@@ -32,11 +34,17 @@ connectDB();
 
 // Auth Routes
 app.use("/api/auth", authRoutes);
+//transaction Routes
+app.use("/api/transactions", transactionRoutes);
 
 // Test Route
 app.get("/", (req: Request, res: Response) => {
   res.json({ message: "Financial Tracker API is running! 🚀" });
 });
+
+// Error handling (must be last)
+app.use(notFound);
+app.use(errorHandler);
 
 // Start Server
 const PORT = process.env.PORT || 5000;

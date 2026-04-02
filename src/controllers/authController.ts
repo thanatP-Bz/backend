@@ -3,12 +3,11 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { validationResult } from "express-validator";
 import User from "../models/User";
-import { asyncHandler } from "../middleware/errorHandler";
+import { asyncHandler } from "../utils/AsyncHandler";
 
 // Register new user
 export const register = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {
-    // Check for validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       res.status(400).json({
@@ -25,7 +24,7 @@ export const register = asyncHandler(
     if (existingUser) {
       res.status(400).json({
         success: false,
-        message: "User already exists with this email",
+        message: "An account with this email already exists", // ← Clear message
       });
       return;
     }
@@ -44,17 +43,14 @@ export const register = asyncHandler(
     await user.save();
 
     // Generate JWT token
-    const payload = {
-      userId: user._id,
-    };
-
+    const payload = { userId: user._id };
     const token = jwt.sign(payload, process.env.JWT_SECRET as string, {
       expiresIn: "7d",
     });
 
     res.status(201).json({
       success: true,
-      message: "User registered successfully",
+      message: "Account created successfully",
       token,
       user: {
         id: user._id,
@@ -68,7 +64,6 @@ export const register = asyncHandler(
 // Login user
 export const login = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {
-    // Check for validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       res.status(400).json({
@@ -83,9 +78,10 @@ export const login = asyncHandler(
     // Check if user exists
     const user = await User.findOne({ email });
     if (!user) {
-      res.status(400).json({
+      res.status(404).json({
+        // ← Changed from 400 to 404
         success: false,
-        message: "Invalid credentials",
+        message: "No account found with this email address", // ← Specific message
       });
       return;
     }
@@ -93,18 +89,16 @@ export const login = asyncHandler(
     // Check password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      res.status(400).json({
+      res.status(401).json({
+        // ← Changed from 400 to 401 (Unauthorized)
         success: false,
-        message: "Invalid credentials",
+        message: "Incorrect password. Please try again", // ← Specific message
       });
       return;
     }
 
     // Generate JWT token
-    const payload = {
-      userId: user._id,
-    };
-
+    const payload = { userId: user._id };
     const token = jwt.sign(payload, process.env.JWT_SECRET as string, {
       expiresIn: "7d",
     });

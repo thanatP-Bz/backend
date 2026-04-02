@@ -4,13 +4,14 @@ import {
   registerValidation,
   loginValidation,
 } from "../validators/authValidators";
+import { authLimiter } from "../middleware/rateLimiter";
 
 const router = Router();
 
 // Register route
-router.post("/register", registerValidation, register);
+router.post("/register", authLimiter, registerValidation, register);
 
 // Login route
-router.post("/login", loginValidation, login);
+router.post("/login", authLimiter, loginValidation, login);
 
 export default router;

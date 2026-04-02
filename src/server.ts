@@ -4,6 +4,7 @@ import express, { Application, Request, Response } from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
+import authRoutes from "./routes/authRoutes";
 
 // Load environment variables
 dotenv.config();
@@ -29,13 +30,13 @@ const connectDB = async () => {
 
 connectDB();
 
+// Auth Routes
+app.use("/api/auth", authRoutes);
+
 // Test Route
 app.get("/", (req: Request, res: Response) => {
   res.json({ message: "Financial Tracker API is running! 🚀" });
 });
-
-// Routes will go here
-// app.use('/api/auth', authRoutes);
 
 // Start Server
 const PORT = process.env.PORT || 5000;

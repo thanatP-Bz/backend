@@ -1,5 +1,10 @@
 import { Router } from "express";
-import { register, login } from "../controllers/authController";
+import {
+  register,
+  login,
+  refreshAccessToken,
+  logout,
+} from "../controllers/authController";
 import {
   registerValidation,
   loginValidation,
@@ -13,5 +18,11 @@ router.post("/register", authLimiter, registerValidation, register);
 
 // Login route
 router.post("/login", authLimiter, loginValidation, login);
+
+// Refresh token route
+router.post("/refresh", refreshAccessToken);
+
+// Logout route
+router.post("/logout", logout);
 
 export default router;

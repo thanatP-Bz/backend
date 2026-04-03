@@ -4,6 +4,7 @@ export interface IUser extends Document {
   name: string;
   email: string;
   password: string;
+  refreshToken?: string | null;
   createdAt: Date;
 }
 
@@ -24,6 +25,10 @@ const UserSchema: Schema = new Schema({
     type: String,
     required: [true, "Password is required"],
     minlength: [6, "Password must be at least 6 characters"],
+  },
+  refreshToken: {
+    type: String,
+    default: null,
   },
   createdAt: {
     type: Date,

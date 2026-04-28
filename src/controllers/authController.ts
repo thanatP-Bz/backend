@@ -52,9 +52,9 @@ export const register = asyncHandler(
 
     res.status(201).json({
       success: true,
-      message: "Account created successfully",
+      message: "register successfully",
       accessToken,
-      refreshAccessToken,
+      refreshToken,
       user: {
         id: user._id,
         name: user.name,

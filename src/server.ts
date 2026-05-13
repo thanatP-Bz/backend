@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import authRoutes from "./routes/authRoutes";
 import transactionRoutes from "./routes/transactionRoutes";
+import budgetRoutes from "./routes/budgetRoutes";
 import { errorHandler, notFound } from "./middleware/errorHandler";
 
 // Load environment variables
@@ -17,8 +18,8 @@ const app: Application = express();
 // Middleware
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || process.env.LOCAL_HOST,
-    /*  origin: "http://localhost:5173", */
+    /* origin: process.env.FRONTEND_URL || process.env.LOCAL_HOST, */
+    origin: "http://localhost:5173",
     credentials: true,
   }),
 );
@@ -42,6 +43,8 @@ connectDB();
 app.use("/api/auth", authRoutes);
 //transaction Routes
 app.use("/api/transactions", transactionRoutes);
+//budget Routes
+app.use("/api/budget", budgetRoutes);
 
 // Test Route
 app.get("/", (req: Request, res: Response) => {
